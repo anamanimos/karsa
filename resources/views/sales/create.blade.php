@@ -52,22 +52,6 @@
             </template>
         </div>
 
-        {{-- Floating Cart Button --}}
-        <button @click="openCart = true" x-show="cart.length > 0" x-transition
-                class="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 fixed bottom-40 right-5 z-40">
-            <div class="relative">
-                <!-- Duotone Icon: Shopping Cart -->
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path opacity="0.3" d="M5.4 5L7 13H17L21 5H5.4Z" fill="currentColor"/>
-                    <path d="M3 3H5.4L7 13H17L21 5H5.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="9" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
-                    <circle cx="17" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
-                </svg>
-                <span class="absolute -top-2 -right-2 bg-accent-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm"
-                      x-text="cartCount()"></span>
-            </div>
-        </button>
-
         {{-- Cart Slide-Up Sheet --}}
         <div x-show="openCart" x-transition.opacity class="bottom-sheet-overlay" @click="openCart = false"></div>
         <div x-show="openCart" x-transition:enter="transition ease-out duration-300 transform"
@@ -226,40 +210,61 @@
             </div>
         </div>
 
-        {{-- Floating Search Button --}}
+        {{-- Floating Action Buttons (Cart & Search) --}}
         <div class="fixed bottom-24 left-0 right-0 z-40 px-5 pointer-events-none">
-            <div class="max-w-lg mx-auto relative flex justify-end h-12">
-                <div class="absolute right-0 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-full overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
-                     :class="openFloatingSearch ? 'w-full h-12' : 'w-12 h-12'">
-                     
-                     {{-- Collapsed Button --}}
-                     <button type="button" x-show="!openFloatingSearch"
-                             @click="openFloatingSearch = true; $nextTick(() => $refs.floatSearchInput.focus())"
-                             class="w-full h-full flex items-center justify-center text-primary-600 active:scale-95 transition-transform duration-150"
-                             title="Cari Barang">
-                         <!-- Duotone Icon: Search -->
-                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                             <circle opacity="0.3" cx="11" cy="11" r="7" fill="currentColor"/>
-                             <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-                             <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                         </svg>
-                     </button>
-                     
-                     {{-- Expanded Form --}}
-                     <div x-show="openFloatingSearch" class="w-full h-full flex items-center px-4 gap-2.5" style="display: none;">
-                         <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                         </svg>
-                         <input type="text" x-model="searchQuery" x-ref="floatSearchInput"
-                                placeholder="Cari nama barang..."
-                                @keydown.escape="openFloatingSearch = false"
-                                class="flex-1 bg-transparent border-0 outline-none text-xs font-semibold text-gray-700 placeholder-gray-400 focus:ring-0 p-0">
-                         <button type="button" 
-                                 @click="openFloatingSearch = false; searchQuery = ''"
-                                 class="text-xs text-gray-400 hover:text-gray-600 font-bold flex-shrink-0 px-1 py-1">
-                             Batal
+            <div class="max-w-lg mx-auto flex flex-col items-end gap-3">
+                
+                {{-- Floating Cart Button (stacked directly above Search) --}}
+                <button type="button" @click="openCart = true" x-show="cart.length > 0" x-transition
+                        class="w-12 h-12 rounded-full bg-white/95 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto"
+                        title="Lihat Keranjang">
+                    <div class="relative">
+                        <!-- Duotone Icon: Shopping Cart -->
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.3" d="M5.4 5L7 13H17L21 5H5.4Z" fill="currentColor"/>
+                            <path d="M3 3H5.4L7 13H17L21 5H5.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="9" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+                            <circle cx="17" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+                        </svg>
+                        <span class="absolute -top-2 -right-2 bg-accent-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm"
+                              x-text="cartCount()"></span>
+                    </div>
+                </button>
+
+                {{-- Floating Search Button --}}
+                <div class="relative flex justify-end h-12 w-full">
+                    <div class="absolute right-0 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-full overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
+                         :class="openFloatingSearch ? 'w-full h-12' : 'w-12 h-12'">
+                         
+                         {{-- Collapsed Button --}}
+                         <button type="button" x-show="!openFloatingSearch"
+                                 @click="openFloatingSearch = true; $nextTick(() => $refs.floatSearchInput.focus())"
+                                 class="w-full h-full flex items-center justify-center text-primary-600 active:scale-95 transition-transform duration-150"
+                                 title="Cari Barang">
+                             <!-- Duotone Icon: Search -->
+                             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                 <circle opacity="0.3" cx="11" cy="11" r="7" fill="currentColor"/>
+                                 <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                                 <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                             </svg>
                          </button>
-                     </div>
+                         
+                         {{-- Expanded Form --}}
+                         <div x-show="openFloatingSearch" class="w-full h-full flex items-center px-4 gap-2.5" style="display: none;">
+                             <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                             </svg>
+                             <input type="text" x-model="searchQuery" x-ref="floatSearchInput"
+                                    placeholder="Cari nama barang..."
+                                    @keydown.escape="openFloatingSearch = false"
+                                    class="flex-1 bg-transparent border-0 outline-none text-xs font-semibold text-gray-700 placeholder-gray-400 focus:ring-0 p-0">
+                             <button type="button" 
+                                     @click="openFloatingSearch = false; searchQuery = ''"
+                                     class="text-xs text-gray-400 hover:text-gray-600 font-bold flex-shrink-0 px-1 py-1">
+                                 Batal
+                             </button>
+                         </div>
+                    </div>
                 </div>
             </div>
         </div>
