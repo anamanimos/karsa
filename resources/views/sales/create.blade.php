@@ -298,6 +298,21 @@
                 })(),
                 submitting: false,
 
+                init() {
+                    window.addEventListener('keydown', (e) => {
+                        if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
+                            e.preventDefault();
+                            this.openFloatingSearch = true;
+                            this.$nextTick(() => {
+                                if (this.$refs.floatSearchInput) {
+                                    this.$refs.floatSearchInput.focus();
+                                    this.$refs.floatSearchInput.select();
+                                }
+                            });
+                        }
+                    });
+                },
+
                 filteredProducts() {
                     if (!this.searchQuery) return this.products;
                     const query = this.searchQuery.toLowerCase();
