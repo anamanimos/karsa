@@ -414,8 +414,16 @@
                         }))
                     };
 
-                    // Open new tab for receipt (prevents popup blockers)
-                    const receiptWindow = window.open('about:blank', '_blank');
+                    // Open new tab synchronously during user gesture (prevents popup blockers)
+                    let receiptWindow = null;
+                    try {
+                        receiptWindow = window.open('', '_blank');
+                        if (receiptWindow) {
+                            receiptWindow.document.write('<!DOCTYPE html><html><head><title>Struk Penjualan</title><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f9fafb;"><div style="text-align:center;"><p style="font-size:14px;color:#4b5563;font-weight:600;">Memuat Struk Penjualan...</p></div></body></html>');
+                        }
+                    } catch (e) {
+                        receiptWindow = null;
+                    }
 
                     fetch('{{ route('sales.store') }}', {
                         method: 'POST',
@@ -431,20 +439,29 @@
                         this.submitting = false;
                         if (data.redirect) {
                             // Navigate new tab to PDF receipt
-                            if (receiptWindow) {
+                            if (receiptWindow && !receiptWindow.closed) {
                                 receiptWindow.location.href = data.redirect;
                             } else {
-                                window.open(data.redirect, '_blank');
+                                const a = document.createElement('a');
+                                a.href = data.redirect;
+                                a.target = '_blank';
+                                a.rel = 'noopener noreferrer';
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
                             }
-                            // Reload cashier page for next transaction
-                            window.location.reload();
+
+                            // Wait 800ms before reloading cashier page so new tab navigation completes
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 800);
                         } else {
-                            if (receiptWindow) receiptWindow.close();
+                            if (receiptWindow && !receiptWindow.closed) receiptWindow.close();
                             if (data.message) alert(data.message);
                         }
                     })
                     .catch(err => {
-                        if (receiptWindow) receiptWindow.close();
+                        if (receiptWindow && !receiptWindow.closed) receiptWindow.close();
                         this.submitting = false;
                         alert('Terjadi kesalahan saat menyimpan transaksi.');
                     });
