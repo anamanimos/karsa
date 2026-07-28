@@ -414,6 +414,9 @@
                         }))
                     };
 
+                    // Open new tab for receipt (prevents popup blockers)
+                    const receiptWindow = window.open('about:blank', '_blank');
+
                     fetch('{{ route('sales.store') }}', {
                         method: 'POST',
                         headers: {
@@ -427,13 +430,21 @@
                     .then(data => {
                         this.submitting = false;
                         if (data.redirect) {
-                            // Redirect to PDF Receipt
-                            window.location.href = data.redirect;
-                        } else if (data.message) {
-                            alert(data.message);
+                            // Navigate new tab to PDF receipt
+                            if (receiptWindow) {
+                                receiptWindow.location.href = data.redirect;
+                            } else {
+                                window.open(data.redirect, '_blank');
+                            }
+                            // Reload cashier page for next transaction
+                            window.location.reload();
+                        } else {
+                            if (receiptWindow) receiptWindow.close();
+                            if (data.message) alert(data.message);
                         }
                     })
                     .catch(err => {
+                        if (receiptWindow) receiptWindow.close();
                         this.submitting = false;
                         alert('Terjadi kesalahan saat menyimpan transaksi.');
                     });
