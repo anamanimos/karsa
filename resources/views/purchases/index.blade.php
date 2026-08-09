@@ -26,7 +26,7 @@
                                 <span class="badge-unpaid">Belum Lunas</span>
                             @endif
                         </div>
-                        <form action="{{ route('purchases.destroy', $purchase) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pembelian {{ $purchase->invoice_number }}? Stok barang akan disesuaikan secara otomatis.');" class="inline">
+                        <form action="{{ route('purchases.destroy', $purchase) }}" method="POST" class="inline confirm-delete" data-confirm="Apakah Anda yakin ingin menghapus data pembelian {{ $purchase->invoice_number }}? Stok barang akan disesuaikan secara otomatis.">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Hapus Pembelian">

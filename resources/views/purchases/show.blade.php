@@ -12,7 +12,7 @@
                    class="px-3 py-1.5 text-xs font-bold text-primary-600 hover:text-primary-700 bg-white/80 hover:bg-white border border-gray-200 rounded-xl transition-all shadow-sm active:scale-95">
                     ✏️ Edit Nota
                 </a>
-                <form action="{{ route('purchases.destroy', $purchase) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pembelian {{ $purchase->invoice_number }}? Stok barang akan disesuaikan secara otomatis.');" class="inline">
+                <form action="{{ route('purchases.destroy', $purchase) }}" method="POST" class="inline confirm-delete" data-confirm="Apakah Anda yakin ingin menghapus data pembelian {{ $purchase->invoice_number }}? Stok barang akan disesuaikan secara otomatis.">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 text-xs px-3 py-1.5 rounded-xl font-bold shadow-sm transition-all flex items-center gap-1 active:scale-95">

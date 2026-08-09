@@ -48,7 +48,7 @@
                                 <span class="badge-unpaid">Hutang</span>
                             @endif
                         </div>
-                        <form action="{{ route('sales.destroy', $sale) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi {{ $sale->invoice_number }}? Stok produk akan dikembalikan secara otomatis.');" class="inline">
+                        <form action="{{ route('sales.destroy', $sale) }}" method="POST" class="inline confirm-delete" data-confirm="Apakah Anda yakin ingin menghapus transaksi {{ $sale->invoice_number }}? Stok produk akan dikembalikan secara otomatis.">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Hapus Penjualan">

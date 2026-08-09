@@ -60,7 +60,7 @@
                             <p class="font-bold text-dark">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</p>
                             <p class="text-[10px] text-gray-400 capitalize">{{ $sale->payment_method }}</p>
                         </div>
-                        <form action="{{ route('sales.destroy', $sale) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi {{ $sale->invoice_number }}? Stok produk akan dikembalikan secara otomatis.');" class="inline">
+                        <form action="{{ route('sales.destroy', $sale) }}" method="POST" class="inline confirm-delete" data-confirm="Apakah Anda yakin ingin menghapus transaksi {{ $sale->invoice_number }}? Stok produk akan dikembalikan secara otomatis.">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Hapus Penjualan">

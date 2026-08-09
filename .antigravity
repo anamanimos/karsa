@@ -1,0 +1,9 @@
+# Antigravity Rules & Standards - Postani App
+
+## UI & Dialog Standards
+1. **Dilarang Menggunakan Dialog Bawaan Browser (Native Browser Alert/Confirm)**:
+   - Dilarang keras menggunakan `alert(...)` atau `confirm(...)` native JavaScript di halaman blade view manapun.
+2. **Standar SweetAlert2**:
+   - Seluruh konfirmasi hapus data (Pembelian, Penjualan, Produk, Kategori, Satuan, Tengkulak, Pelanggan, Galeri, dll) **WAJIB** menggunakan SweetAlert2.
+   - Pada elemen `<form>` penghapusan data, gunakan attribute: `class="confirm-delete"` dan `data-confirm="Pesan konfirmasi..."` (akan ditangkap secara otomatis oleh event listener global di `app.blade.php`).
+   - Pada panggilan JavaScript / AJAX interaktif, gunakan `Swal.fire({ icon: 'warning|error|success', title: '...', text: '...', customClass: { popup: 'rounded-2xl font-sans shadow-lg' } })`.

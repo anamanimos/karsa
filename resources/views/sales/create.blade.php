@@ -328,7 +328,12 @@
                         // Check stock first
                         const buyUnitQty = 1 * product.conversion_factor;
                         if (product.stock < buyUnitQty) {
-                            alert(`Stok tidak mencukupi untuk ${product.name}! Stok: ${product.stock / product.conversion_factor}`);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Stok Tidak Mencukupi',
+                                text: `Stok tidak mencukupi untuk ${product.name}! Tersedia: ${product.stock / product.conversion_factor}`,
+                                customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                            });
                             return;
                         }
                         this.cart.push({
@@ -343,7 +348,12 @@
                     const nextQty = item.quantity + 1;
                     const buyUnitQty = nextQty * item.conversion_factor;
                     if (item.stock < buyUnitQty) {
-                        alert(`Stok tidak mencukupi! Stok: ${item.stock / item.conversion_factor}`);
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stok Tidak Mencukupi',
+                            text: `Stok tidak mencukupi! Tersedia: ${item.stock / item.conversion_factor}`,
+                            customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                        });
                         return;
                     }
                     item.quantity = nextQty;
@@ -366,7 +376,12 @@
                     }
                     const buyUnitQty = item.quantity * item.conversion_factor;
                     if (item.stock < buyUnitQty) {
-                        alert(`Stok tidak mencukupi! Stok: ${item.stock / item.conversion_factor}`);
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stok Tidak Mencukupi',
+                            text: `Stok tidak mencukupi! Tersedia: ${item.stock / item.conversion_factor}`,
+                            customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                        });
                         item.quantity = Math.floor(item.stock / item.conversion_factor);
                         if (item.quantity <= 0) {
                             this.removeFromCart(idx);
@@ -406,13 +421,23 @@
                     for (let i = 0; i < this.cart.length; i++) {
                         const item = this.cart[i];
                         if (item.selling_price === '' || isNaN(item.selling_price) || item.selling_price < 0) {
-                            alert(`Harga jual untuk ${item.name} tidak valid!`);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Harga Tidak Valid',
+                                text: `Harga jual untuk ${item.name} tidak valid!`,
+                                customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                            });
                             return;
                         }
                     }
 
                     if (this.paymentMethod === 'credit' && !this.customerId) {
-                        alert('Silakan pilih pelanggan untuk transaksi Hutang/Kredit!');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Pelanggan Wajib Dipilih',
+                            text: 'Silakan pilih pelanggan untuk transaksi Hutang/Kredit!',
+                            customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                        });
                         return;
                     }
 
@@ -472,13 +497,25 @@
                             }, 800);
                         } else {
                             if (receiptWindow && !receiptWindow.closed) receiptWindow.close();
-                            if (data.message) alert(data.message);
+                            if (data.message) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal Transaksi',
+                                    text: data.message,
+                                    customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                                });
+                            }
                         }
                     })
                     .catch(err => {
                         if (receiptWindow && !receiptWindow.closed) receiptWindow.close();
                         this.submitting = false;
-                        alert('Terjadi kesalahan saat menyimpan transaksi.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan',
+                            text: 'Terjadi kesalahan saat menyimpan transaksi.',
+                            customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                        });
                     });
                 }
             };

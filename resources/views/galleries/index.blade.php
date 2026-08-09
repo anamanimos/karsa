@@ -763,31 +763,61 @@ document.addEventListener('alpine:init', () => {
         },
 
         deleteItem(id) {
-            if (confirm("Yakin ingin menghapus gambar ini dari galeri?")) {
-                closeGalleryPreview(); // Close lightbox if open
-                
-                fetch(`/galleries/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ _method: 'DELETE' })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        this.items = this.items.filter(item => item.id !== id);
-                    } else {
-                        alert(data.message || 'Gagal menghapus gambar.');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Terjadi kesalahan saat menghapus gambar.');
-                });
-            }
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Yakin ingin menghapus gambar ini dari galeri?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#9ca3af',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    closeGalleryPreview(); // Close lightbox if open
+                    
+                    fetch(`/galleries/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ _method: 'DELETE' })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.items = this.items.filter(item => item.id !== id);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: 'Gambar berhasil dihapus.',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Gagal menghapus gambar.',
+                                customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan',
+                            text: 'Terjadi kesalahan saat menghapus gambar.',
+                            customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                        });
+                    });
+                }
+            });
         },
 
         openUsageModal(usages, filename) {
@@ -839,13 +869,23 @@ document.addEventListener('alpine:init', () => {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    alert(data.message || 'Gagal menyimpan label.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: data.message || 'Gagal menyimpan label.',
+                        customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                    });
                 }
             })
             .catch(err => {
                 this.isSavingLabels = false;
                 console.error(err);
-                alert('Terjadi kesalahan saat menyimpan label.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Terjadi kesalahan saat menyimpan label.',
+                    customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
+                });
             });
         }
     }));
