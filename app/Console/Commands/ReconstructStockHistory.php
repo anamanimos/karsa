@@ -47,9 +47,14 @@ class ReconstructStockHistory extends Command
                     $purchase = $pItem->purchase;
                     if (!$purchase) continue;
 
+                    $pDate = $purchase->purchase_date ? \Carbon\Carbon::parse($purchase->purchase_date) : null;
+                    $eventTimestamp = $pDate 
+                        ? ($pItem->created_at ? $pDate->copy()->setTimeFrom($pItem->created_at) : $pDate)
+                        : ($pItem->created_at ?? $purchase->created_at);
+
                     // Creation event
                     $events[] = [
-                        'timestamp' => $pItem->created_at ?? $purchase->created_at ?? $purchase->purchase_date,
+                        'timestamp' => $eventTimestamp,
                         'type' => 'purchase',
                         'quantity' => (float) $pItem->quantity,
                         'reference_type' => get_class($pItem),
@@ -86,11 +91,16 @@ class ReconstructStockHistory extends Command
                     $sale = $sItem->sale;
                     if (!$sale) continue;
 
+                    $sDate = $sale->sale_date ? \Carbon\Carbon::parse($sale->sale_date) : null;
+                    $eventTimestamp = $sDate 
+                        ? ($sItem->created_at ? $sDate->copy()->setTimeFrom($sItem->created_at) : $sDate)
+                        : ($sItem->created_at ?? $sale->created_at);
+
                     $stockReduction = (float) ($sItem->quantity * $product->conversion_factor);
 
                     // Creation event
                     $events[] = [
-                        'timestamp' => $sItem->created_at ?? $sale->created_at ?? $sale->sale_date,
+                        'timestamp' => $eventTimestamp,
                         'type' => 'sale',
                         'quantity' => -$stockReduction,
                         'reference_type' => get_class($sItem),

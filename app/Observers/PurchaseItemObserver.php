@@ -26,6 +26,8 @@ class PurchaseItemObserver
 
         // 1. Increase product stock by quantity (already in buy_unit) and log movement
         $invoiceNo = $purchase ? $purchase->invoice_number : '';
+        $purchaseDate = ($purchase && $purchase->purchase_date) ? \Carbon\Carbon::parse($purchase->purchase_date)->setTimeFrom(\Carbon\Carbon::now()) : null;
+
         StockMovement::log(
             product: $product,
             type: 'purchase',
@@ -33,7 +35,8 @@ class PurchaseItemObserver
             reference: $purchaseItem,
             notes: "Pembelian {$invoiceNo}",
             userId: $purchase ? $purchase->created_by : auth()->id(),
-            updateProductStock: true
+            updateProductStock: true,
+            timestamp: $purchaseDate
         );
 
         // 2. Update last_purchase_price

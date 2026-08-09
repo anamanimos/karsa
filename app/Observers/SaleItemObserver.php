@@ -34,6 +34,8 @@ class SaleItemObserver
 
         // 3. Decrease product stock and log movement
         $invoiceNo = $sale ? $sale->invoice_number : '';
+        $saleDate = ($sale && $sale->sale_date) ? \Carbon\Carbon::parse($sale->sale_date)->setTimeFrom(\Carbon\Carbon::now()) : null;
+
         StockMovement::log(
             product: $product,
             type: 'sale',
@@ -41,7 +43,8 @@ class SaleItemObserver
             reference: $saleItem,
             notes: "Penjualan {$invoiceNo}",
             userId: $sale ? $sale->created_by : auth()->id(),
-            updateProductStock: true
+            updateProductStock: true,
+            timestamp: $saleDate
         );
     }
 }

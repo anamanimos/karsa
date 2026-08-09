@@ -46,17 +46,17 @@ class StockMovement extends Model
     public function getTransactionDateAttribute()
     {
         if ($this->reference) {
-            if ($this->reference instanceof \App\Models\PurchaseItem && $this->reference->relationLoaded('purchase') && $this->reference->purchase) {
-                return $this->reference->purchase->purchase_date;
+            if ($this->reference instanceof \App\Models\PurchaseItem) {
+                return $this->reference->purchase?->purchase_date ?? $this->created_at;
             }
             if ($this->reference instanceof \App\Models\Purchase) {
-                return $this->reference->purchase_date;
+                return $this->reference->purchase_date ?? $this->created_at;
             }
-            if ($this->reference instanceof \App\Models\SaleItem && $this->reference->relationLoaded('sale') && $this->reference->sale) {
-                return $this->reference->sale->sale_date;
+            if ($this->reference instanceof \App\Models\SaleItem) {
+                return $this->reference->sale?->sale_date ?? $this->created_at;
             }
             if ($this->reference instanceof \App\Models\Sale) {
-                return $this->reference->sale_date;
+                return $this->reference->sale_date ?? $this->created_at;
             }
         }
         return $this->created_at;
