@@ -72,6 +72,54 @@
                 </div>
             </div>
 
+            {{-- Stock Movements History --}}
+            <div class="rounded-glass border border-white/40 shadow-glass overflow-hidden" style="background: rgba(255,255,255,0.6); backdrop-filter: blur(12px);">
+                <div class="px-4 py-3 border-b border-white/30 flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-dark">Riwayat Pergerakan Stok</h3>
+                    <a href="{{ route('reports.stock_movements', ['product_id' => $product->id]) }}" class="text-xs font-semibold text-primary-600 hover:underline">
+                        Lihat Semua ➔
+                    </a>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @forelse($product->stockMovements ?? [] as $movement)
+                    <div class="px-4 py-3 hover:bg-white/40 transition-colors">
+                        <div class="flex items-center justify-between text-xs">
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-dark">{{ $movement->notes }}</span>
+                                    @if(in_array($movement->type, ['purchase', 'sale_delete']))
+                                        <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-green-100 text-green-700">
+                                            +{{ number_format($movement->quantity, 2) }}
+                                        </span>
+                                    @else
+                                        <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-red-100 text-red-700">
+                                            {{ number_format($movement->quantity, 2) }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-gray-400 text-[10px]">
+                                    {{ $movement->created_at->format('d/m/Y H:i') }}
+                                    @if($movement->creator)
+                                        · {{ $movement->creator->name }}
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-gray-400">Stok</p>
+                                <p class="font-bold text-dark">
+                                    <span class="text-gray-400 font-normal">{{ number_format($movement->stock_before, 2) }}</span> ➔ <span class="text-primary-600">{{ number_format($movement->stock_after, 2) }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="px-4 py-8 text-center">
+                        <p class="text-sm text-gray-400">Belum ada riwayat pergerakan stok</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
             {{-- Purchase History --}}
             <div class="rounded-glass border border-white/40 shadow-glass overflow-hidden" style="background: rgba(255,255,255,0.6); backdrop-filter: blur(12px);">
                 <div class="px-4 py-3 border-b border-white/30">

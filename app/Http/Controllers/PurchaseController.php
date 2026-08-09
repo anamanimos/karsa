@@ -7,6 +7,7 @@ use App\Models\PurchaseItem;
 use App\Models\PurchasePriceHistory;
 use App\Models\Supplier;
 use App\Models\Product;
+use App\Models\StockMovement;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -250,11 +251,20 @@ class PurchaseController extends Controller
                 $newProductIds = collect($validated['items'])->pluck('product_id')->toArray();
                 $affectedProductIds = array_unique(array_merge($oldProductIds, $newProductIds));
 
-                // 1. Revert stocks of old purchase items
+                // 1. Revert stocks of old purchase items and log movement
                 foreach ($purchase->purchaseItems as $oldItem) {
                     $product = $oldItem->product;
-                    $product->stock -= $oldItem->quantity;
-                    $product->save();
+                    if ($product) {
+                        StockMovement::log(
+                            product: $product,
+                            type: 'purchase_update',
+                            quantityChange: -(float) $oldItem->quantity,
+                            reference: $purchase,
+                            notes: "Revisi Nota Pembelian {$purchase->invoice_number} (batal item lama)",
+                            userId: auth()->id(),
+                            updateProductStock: true
+                        );
+                    }
 
                     // Delete old price history
                     PurchasePriceHistory::where('purchase_item_id', $oldItem->id)->delete();
@@ -378,8 +388,15 @@ class PurchaseController extends Controller
                 foreach ($purchase->purchaseItems as $item) {
                     $product = $item->product;
                     if ($product) {
-                        $product->stock -= $item->quantity;
-                        $product->save();
+                        StockMovement::log(
+                            product: $product,
+                            type: 'purchase_delete',
+                            quantityChange: -(float) $item->quantity,
+                            reference: $purchase,
+                            notes: "Hapus Nota Pembelian {$purchase->invoice_number}",
+                            userId: auth()->id(),
+                            updateProductStock: true
+                        );
                     }
                     PurchasePriceHistory::where('purchase_item_id', $item->id)->delete();
                 }

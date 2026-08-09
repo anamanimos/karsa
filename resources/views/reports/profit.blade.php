@@ -7,6 +7,7 @@
                 <a href="{{ route('reports.purchases') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Pembelian</a>
                 <a href="{{ route('reports.profit') }}" class="px-2 py-1 rounded bg-primary-600 text-white font-semibold">Laba Rugi</a>
                 <a href="{{ route('reports.debts') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Hutang</a>
+                <a href="{{ route('reports.stock_movements') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Riwayat Stok</a>
             </div>
         </div>
     </x-slot>

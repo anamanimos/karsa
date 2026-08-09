@@ -384,8 +384,11 @@
                                 <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('customers.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
                                     <span class="text-lg">👥</span> Pelanggan
                                 </a>
-                                <a href="{{ route('reports.sales') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('reports.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
+                                <a href="{{ route('reports.sales') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('reports.sales', 'reports.purchases', 'reports.profit', 'reports.debts') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
                                     <span class="text-lg">📊</span> Laporan
+                                </a>
+                                <a href="{{ route('reports.stock_movements') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('reports.stock_movements') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
+                                    <span class="text-lg">📜</span> Riwayat Stok
                                 </a>
                                 <div class="border-t border-gray-100 my-1"></div>
                                 <a href="{{ route('payments.suppliers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('payments.suppliers*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\PurchaseItem;
 use App\Models\PurchasePriceHistory;
 use App\Models\Setting;
+use App\Models\StockMovement;
 
 class PurchaseItemObserver
 {
@@ -12,7 +13,7 @@ class PurchaseItemObserver
      * Handle the PurchaseItem "created" event.
      *
      * When a purchase item is created:
-     * 1. Increase product stock by quantity (in buy_unit)
+     * 1. Increase product stock by quantity (in buy_unit) and log stock movement
      * 2. Update last_purchase_price
      * 3. Recalculate avg_purchase_price as weighted average
      * 4. Insert purchase_price_history record
@@ -23,8 +24,17 @@ class PurchaseItemObserver
         $product = $purchaseItem->product;
         $purchase = $purchaseItem->purchase;
 
-        // 1. Increase product stock by quantity (already in buy_unit)
-        $product->stock += $purchaseItem->quantity;
+        // 1. Increase product stock by quantity (already in buy_unit) and log movement
+        $invoiceNo = $purchase ? $purchase->invoice_number : '';
+        StockMovement::log(
+            product: $product,
+            type: 'purchase',
+            quantityChange: (float) $purchaseItem->quantity,
+            reference: $purchaseItem,
+            notes: "Pembelian {$invoiceNo}",
+            userId: $purchase ? $purchase->created_by : auth()->id(),
+            updateProductStock: true
+        );
 
         // 2. Update last_purchase_price
         $product->last_purchase_price = $purchaseItem->unit_price;

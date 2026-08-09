@@ -58,4 +58,9 @@ class Product extends Model
     {
         return $this->belongsTo(Gallery::class, 'image', 'filepath');
     }
+
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class)->latest('id');
+    }
 }

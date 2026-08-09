@@ -105,7 +105,14 @@ class ProductController extends Controller
 
     public function show(Product $product): View
     {
-        $product->load(['category', 'buyUnit', 'sellUnit']);
+        $product->load([
+            'category',
+            'buyUnit',
+            'sellUnit',
+            'stockMovements' => function ($query) {
+                $query->with('creator')->latest('created_at')->latest('id')->take(30);
+            }
+        ]);
 
         return view('products.show', compact('product'));
     }

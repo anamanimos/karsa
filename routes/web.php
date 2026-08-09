@@ -14,6 +14,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CashTransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\StockMovementController;
 use Illuminate\Support\Facades\Route;
 
 // Public route - redirect to login
@@ -52,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/purchases', [ReportController::class, 'purchases'])->name('reports.purchases');
     Route::get('/reports/profit', [ReportController::class, 'profit'])->name('reports.profit');
     Route::get('/reports/debts', [ReportController::class, 'debts'])->name('reports.debts');
+    Route::get('/reports/stock-movements', [StockMovementController::class, 'index'])->name('reports.stock_movements');
     
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

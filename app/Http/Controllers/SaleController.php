@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Setting;
+use App\Models\StockMovement;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -201,9 +202,16 @@ class SaleController extends Controller
                 foreach ($sale->saleItems as $item) {
                     $product = $item->product;
                     if ($product) {
-                        $stockReduction = $item->quantity * $product->conversion_factor;
-                        $product->stock += $stockReduction;
-                        $product->save();
+                        $stockReduction = (float) ($item->quantity * $product->conversion_factor);
+                        StockMovement::log(
+                            product: $product,
+                            type: 'sale_delete',
+                            quantityChange: $stockReduction,
+                            reference: $sale,
+                            notes: "Hapus Nota Penjualan {$sale->invoice_number}",
+                            userId: auth()->id(),
+                            updateProductStock: true
+                        );
                     }
                 }
 
