@@ -16,7 +16,7 @@
         {{-- Filter Card --}}
         <div class="glass-card p-4">
             <form action="{{ route('reports.stock_movements') }}" method="GET" class="space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <div>
                         <label class="block text-[10px] font-semibold text-gray-500 mb-1">Produk</label>
                         <select name="product_id" class="form-input-glass py-1.5 px-3 text-xs">
@@ -47,6 +47,13 @@
                         <label class="block text-[10px] font-semibold text-gray-500 mb-1">Sampai Tanggal</label>
                         <input type="text" name="date_to" value="{{ request('date_to') }}" placeholder="YYYY-MM-DD" class="datepicker form-input-glass py-1.5 px-3 text-xs">
                     </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-1">Urutan Tanggal</label>
+                        <select name="sort" class="form-input-glass py-1.5 px-3 text-xs">
+                            <option value="desc" {{ request('sort', 'desc') === 'desc' ? 'selected' : '' }}>Terbaru (Descending)</option>
+                            <option value="asc" {{ request('sort') === 'asc' ? 'selected' : '' }}>Terlama (Ascending)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex gap-2">
                     <button type="submit" class="btn-primary py-2 text-xs flex-1">Filter</button>
@@ -65,7 +72,7 @@
                 @forelse($movements as $m)
                 <div class="p-3 hover:bg-white/40 text-xs transition-colors flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <div class="space-y-1">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-bold text-dark text-sm">{{ $m->product->name ?? 'Produk Dihapus' }}</span>
                             @if(in_array($m->type, ['purchase', 'sale_delete']))
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
@@ -77,13 +84,18 @@
                                 </span>
                             @endif
                         </div>
-                        <p class="text-gray-500 font-medium">{{ $m->notes }}</p>
-                        <p class="text-[10px] text-gray-400">
-                            ⏱️ {{ $m->created_at->format('d/m/Y H:i:s') }}
+                        <p class="text-gray-600 font-medium">{{ $m->notes }}</p>
+                        <div class="flex items-center gap-2 text-[10px] text-gray-400 flex-wrap pt-0.5">
+                            <span class="font-semibold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">
+                                📅 Tgl Pembelian / Transaksi: {{ $m->transaction_date ? \Carbon\Carbon::parse($m->transaction_date)->locale('id')->isoFormat('D MMMM Y') : $m->created_at->locale('id')->isoFormat('D MMMM Y') }}
+                            </span>
+                            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                ⏱️ Input: {{ $m->created_at->format('d/m/Y H:i') }}
+                            </span>
                             @if($m->creator)
-                                · oleh {{ $m->creator->name }}
+                                <span class="text-gray-400">· oleh {{ $m->creator->name }}</span>
                             @endif
-                        </p>
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-4 text-right self-end md:self-auto bg-gray-50/60 p-2 rounded-lg border border-gray-100">

@@ -43,6 +43,25 @@ class StockMovement extends Model
         return $this->morphTo();
     }
 
+    public function getTransactionDateAttribute()
+    {
+        if ($this->reference) {
+            if ($this->reference instanceof \App\Models\PurchaseItem && $this->reference->relationLoaded('purchase') && $this->reference->purchase) {
+                return $this->reference->purchase->purchase_date;
+            }
+            if ($this->reference instanceof \App\Models\Purchase) {
+                return $this->reference->purchase_date;
+            }
+            if ($this->reference instanceof \App\Models\SaleItem && $this->reference->relationLoaded('sale') && $this->reference->sale) {
+                return $this->reference->sale->sale_date;
+            }
+            if ($this->reference instanceof \App\Models\Sale) {
+                return $this->reference->sale_date;
+            }
+        }
+        return $this->created_at;
+    }
+
     /**
      * Record a stock movement.
      * Optionally updates $product->stock if $updateProductStock is true.
