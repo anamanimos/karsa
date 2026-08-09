@@ -763,6 +763,10 @@ document.addEventListener('alpine:init', () => {
         },
 
         deleteItem(id) {
+            if (typeof closeGalleryPreview === 'function') {
+                closeGalleryPreview();
+            }
+
             Swal.fire({
                 title: 'Konfirmasi Hapus',
                 text: 'Yakin ingin menghapus gambar ini dari galeri?',
@@ -775,7 +779,6 @@ document.addEventListener('alpine:init', () => {
                 customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    closeGalleryPreview(); // Close lightbox if open
                     
                     fetch(`/galleries/${id}`, {
                         method: 'POST',

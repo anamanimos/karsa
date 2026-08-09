@@ -29,6 +29,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
         <style>
+            .swal2-container {
+                z-index: 999999 !important;
+            }
             .select2-container {
                 max-width: 100% !important;
             }
