@@ -24,8 +24,8 @@ class ReconstructStockHistory extends Command
         $this->info('Memulai rekonstruksi riwayat pergerakan stok...');
 
         DB::transaction(function () {
-            // Clear existing movements
-            StockMovement::truncate();
+            // Clear existing movements using DML delete to avoid MySQL implicit DDL commit
+            StockMovement::query()->delete();
 
             $products = Product::all();
             $count = 0;
