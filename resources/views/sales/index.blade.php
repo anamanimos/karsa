@@ -1,14 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-dark">Riwayat Penjualan</h2>
-            <a href="{{ route('sales.create') }}" class="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-full">
-                <span>➕ Jual Baru</span>
-            </a>
-        </div>
+        <x-page-header 
+            title="Riwayat Penjualan"
+            subtitle="Daftar struk transaksi kasir dan riwayat penjualan pelanggan"
+            :searchAction="route('sales.index')"
+            searchPlaceholder="Cari no. invoice, pelanggan..."
+            :createRoute="route('sales.create')"
+            createLabel="Jual Baru (POS)"
+        />
     </x-slot>
 
     <div class="py-5 pb-24 space-y-4">
+        <x-sales-subnav />
+        {{-- Active Search Indicator --}}
+        <x-active-search-indicator :resetUrl="route('sales.index')" />
         {{-- Filter Form --}}
         <div class="glass-card p-4">
             <form action="{{ route('sales.index') }}" method="GET" class="grid grid-cols-2 gap-2">
@@ -72,5 +77,6 @@
         </div>
         @endif
     </div>
+
 </x-app-layout>
 

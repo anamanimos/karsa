@@ -1,9 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-bold text-dark">Produk</h2>
+        <x-page-header 
+            title="Katalog Produk"
+            subtitle="Daftar inventori fisik barang dagangan dan harga jual"
+            :searchAction="route('products.index')"
+            searchPlaceholder="Cari nama produk..."
+            :createRoute="route('products.create')"
+            createLabel="Tambah Produk"
+        />
     </x-slot>
 
     <div class="pb-28 space-y-3" x-data="productList()" @scroll.window="checkScroll()">
+
+        <x-inventory-subnav />
 
         {{-- Sticky Category Filter Chips (fixed under header when scrolled) --}}
         @if(isset($categories) && $categories->count() > 0)
@@ -11,14 +20,14 @@
              :class="isStickyCategory ? 'bg-white/90 backdrop-blur-md border-b border-gray-150 shadow-sm' : 'bg-transparent border-transparent'">
             <div class="flex gap-1.5 whitespace-nowrap">
                 <a href="{{ route('products.index', ['search' => request('search')]) }}"
-                    class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all inline-block flex-shrink-0"
-                    :class="!activeCategory ? 'bg-primary-600 text-white shadow-md' : (isStickyCategory ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-white/85 border border-gray-200/50 text-gray-600 shadow-sm')">
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all inline-block flex-shrink-0"
+                    :class="!activeCategory ? 'bg-primary-600 text-white shadow-xs' : (isStickyCategory ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs')">
                     Semua
                 </a>
                 @foreach($categories as $cat)
                 <a href="{{ route('products.index', ['category' => $cat->id, 'search' => request('search')]) }}"
-                    class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all inline-block flex-shrink-0"
-                    :class="activeCategory == '{{ $cat->id }}' ? 'bg-primary-600 text-white shadow-md' : (isStickyCategory ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-white/85 border border-gray-200/50 text-gray-600 shadow-sm')">
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all inline-block flex-shrink-0"
+                    :class="activeCategory == '{{ $cat->id }}' ? 'bg-primary-600 text-white shadow-xs' : (isStickyCategory ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs')">
                     {{ $cat->name }}
                 </a>
                 @endforeach
@@ -36,9 +45,9 @@
         </div>
 
         {{-- Product Grid (Infinite Scroll) --}}
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             <template x-for="product in items" :key="product.id">
-                <a :href="product.show_url" class="card-solid overflow-hidden block active:scale-[0.98] transition-transform bg-white">
+                <a :href="product.show_url" class="card-solid overflow-hidden block active:scale-[0.98] transition-transform bg-white rounded-lg">
                     <div class="aspect-square bg-gray-100 relative">
                         <template x-if="product.image">
                             <img :src="'/storage/' + product.image" class="w-full h-full object-cover" :alt="product.name" loading="lazy">
@@ -60,7 +69,7 @@
 
                         {{-- Stock Badge --}}
                         <span :class="product.stock <= product.min_stock ? 'bg-red-500 text-white' : 'bg-primary-100 text-primary-700'"
-                              class="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
+                              class="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded font-semibold"
                               x-text="'Stok: ' + formatNumber(product.stock) + ' ' + product.sell_unit_symbol"></span>
 
                         <template x-if="!product.is_active">
@@ -78,7 +87,7 @@
 
             {{-- Empty State (only when no items after initial load) --}}
             <template x-if="items.length === 0 && !loading">
-                <div class="col-span-2 py-12 text-center">
+                <div class="col-span-full py-12 text-center">
                     <!-- Duotone Icon: Package empty -->
                     <svg class="w-16 h-16 text-gray-300 mx-auto mb-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path opacity="0.3" d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
@@ -86,7 +95,7 @@
                         <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <p class="text-sm text-gray-400">Belum ada produk</p>
-                    <a href="{{ route('products.create') }}" class="inline-block mt-3 px-4 py-2 bg-primary-600 text-white text-sm rounded-full">+ Tambah Produk</a>
+                    <a href="{{ route('products.create') }}" class="inline-block mt-3 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg">+ Tambah Produk</a>
                 </div>
             </template>
         </div>
@@ -97,62 +106,6 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
             </svg>
-        </div>
-
-        {{-- Floating Action Buttons --}}
-        {{-- 1. Floating add button (bottom-40, always visible) --}}
-        <div class="fixed bottom-40 left-0 right-0 z-40 px-5 pointer-events-none">
-            <div class="max-w-lg mx-auto flex justify-end">
-                <a href="{{ route('products.create') }}"
-                   class="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto"
-                   title="Tambah Produk Baru">
-                    <!-- Duotone Icon: Plus -->
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle opacity="0.3" cx="12" cy="12" r="10" fill="currentColor"/>
-                        <path d="M12 8V16M8 12H16" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </a>
-            </div>
-        </div>
-
-        {{-- 2. Floating search button (bottom-24) --}}
-        <div class="fixed bottom-24 left-0 right-0 z-40 px-5 pointer-events-none">
-            <div class="max-w-lg mx-auto relative flex justify-end h-12">
-                <div class="absolute right-0 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-full overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
-                     :class="openFloatingSearch ? 'w-full h-12' : 'w-12 h-12'">
-                     
-                     {{-- Collapsed Button --}}
-                     <button type="button" x-show="!openFloatingSearch"
-                             @click="openFloatingSearch = true; $nextTick(() => $refs.floatSearchInput.focus())"
-                             class="w-full h-full flex items-center justify-center text-primary-600 active:scale-95 transition-transform duration-150"
-                             title="Cari Produk">
-                         <!-- Duotone Icon: Search -->
-                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                             <circle opacity="0.3" cx="11" cy="11" r="7" fill="currentColor"/>
-                             <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-                             <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                         </svg>
-                     </button>
-                     
-                     {{-- Expanded Form --}}
-                     <form x-show="openFloatingSearch" @submit.prevent="submitSearch()"
-                           class="w-full h-full flex items-center px-4 gap-2.5" style="display: none;">
-                         <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                         </svg>
-                         <input type="text" x-model="searchQuery" x-ref="floatSearchInput"
-                                placeholder="Cari nama produk..."
-                                @keydown.escape="cancelSearch()"
-                                class="flex-1 bg-transparent border-0 outline-none text-xs font-semibold text-gray-700 placeholder-gray-400 focus:ring-0 p-0">
-                         <button type="submit" class="text-xs text-primary-600 hover:text-primary-700 font-bold flex-shrink-0 px-1 py-1">Cari</button>
-                         <button type="button" 
-                                 @click="cancelSearch()"
-                                 class="text-xs text-gray-400 hover:text-gray-600 font-bold flex-shrink-0 px-1 py-1">
-                             Batal
-                         </button>
-                     </form>
-                </div>
-            </div>
         </div>
 
     </div>

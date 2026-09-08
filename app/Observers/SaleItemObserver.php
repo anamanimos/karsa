@@ -17,8 +17,12 @@ class SaleItemObserver
      */
     public function created(SaleItem $saleItem): void
     {
-        $product = $saleItem->product;
-        $sale = $saleItem->sale;
+        $product = $saleItem->product ?? \App\Models\Product::withoutGlobalScope('business')->find($saleItem->product_id);
+        $sale = $saleItem->sale ?? \App\Models\Sale::withoutGlobalScope('business')->find($saleItem->sale_id);
+
+        if (!$product) {
+            return;
+        }
 
         // 1. Convert quantity from sell_unit to buy_unit
         $stockReduction = (float) ($saleItem->quantity * $product->conversion_factor);

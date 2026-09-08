@@ -17,19 +17,20 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .store-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             text-transform: uppercase;
         }
         .store-info {
             font-size: 8px;
+            color: #333;
         }
         .separator {
             border-top: 1px dashed #000;
-            margin: 5px 0;
+            margin: 4px 0;
         }
         .meta-info table {
             width: 100%;
@@ -38,23 +39,25 @@
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 8px 0;
+            margin: 5px 0;
         }
         .items-table th {
             text-align: left;
             border-bottom: 1px dashed #000;
-            padding-bottom: 3px;
+            padding-bottom: 2px;
+            font-size: 8px;
         }
         .items-table td {
-            padding: 3px 0;
+            padding: 2px 0;
             vertical-align: top;
+            font-size: 9px;
         }
         .text-right {
             text-align: right;
         }
         .totals {
             width: 100%;
-            margin-top: 5px;
+            margin-top: 4px;
         }
         .totals td {
             padding: 1px 0;
@@ -62,16 +65,28 @@
         }
         .footer {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 12px;
             font-size: 8px;
         }
     </style>
 </head>
 <body>
+    @php
+        $companyName = $settings->get('company_name', $settings->get('store_name', 'KarsaERP'));
+        $companyPhone = $settings->get('company_phone', $settings->get('store_phone', ''));
+        $companyAddress = $settings->get('company_address', $settings->get('store_address', ''));
+        $footerText = $settings->get('receipt_footer', 'Terima kasih atas kunjungan Anda!');
+        $subtotalRaw = $sale->saleItems->sum('subtotal');
+    @endphp
+
     <div class="header">
-        <div class="store-name">TOKO TANI</div>
-        <div class="store-info">Sistem Kasir Pertanian Digital</div>
-        <div class="store-info">Telp: 081234567890</div>
+        <div class="store-name">{{ $companyName }}</div>
+        @if($companyAddress)
+            <div class="store-info">{{ $companyAddress }}</div>
+        @endif
+        @if($companyPhone)
+            <div class="store-info">Telp/WA: {{ $companyPhone }}</div>
+        @endif
     </div>
 
     <div class="separator"></div>
@@ -80,11 +95,11 @@
         <table>
             <tr>
                 <td>No: {{ $sale->invoice_number }}</td>
-                <td class="text-right">Kasir: {{ $sale->creator->name ?? 'Admin' }}</td>
+                <td class="text-right">Kasir: {{ $sale->cashier->name ?? ($sale->creator->name ?? 'Kasir') }}</td>
             </tr>
             <tr>
-                <td>Tgl: {{ $sale->sale_date->format('d/m/Y H:i') }}</td>
-                <td class="text-right">Pelanggan: {{ $sale->customer->name ?? 'Walk-in (Umum)' }}</td>
+                <td>Tgl: {{ \Carbon\Carbon::parse($sale->sale_date)->format('d/m/Y H:i') }}</td>
+                <td class="text-right">Plg: {{ $sale->customer->name ?? 'Walk-in (Umum)' }}</td>
             </tr>
         </table>
     </div>
@@ -94,7 +109,7 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th>Barang</th>
+                <th>Item</th>
                 <th class="text-right">Qty</th>
                 <th class="text-right">Harga</th>
                 <th class="text-right">Total</th>
@@ -103,8 +118,8 @@
         <tbody>
             @foreach($sale->saleItems as $item)
             <tr>
-                <td>{{ $item->product->name }}</td>
-                <td class="text-right">{{ $item->quantity }} {{ $item->product->sellUnit->symbol }}</td>
+                <td>{{ $item->product->name ?? 'Item' }}</td>
+                <td class="text-right">{{ $item->quantity }} {{ $item->product->sellUnit->symbol ?? '' }}</td>
                 <td class="text-right">{{ number_format($item->unit_price, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($item->subtotal, 0, ',', '.') }}</td>
             </tr>
@@ -115,22 +130,48 @@
     <div class="separator"></div>
 
     <table class="totals">
+        @if($sale->discount_amount > 0 || $sale->tax_amount > 0)
         <tr>
-            <td>TOTAL BELANJA</td>
-            <td class="text-right font-bold">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
+            <td>Subtotal</td>
+            <td class="text-right">Rp {{ number_format($subtotalRaw, 0, ',', '.') }}</td>
+        </tr>
+        @endif
+
+        @if($sale->discount_amount > 0)
+        <tr>
+            <td>Diskon (-)</td>
+            <td class="text-right">- Rp {{ number_format($sale->discount_amount, 0, ',', '.') }}</td>
+        </tr>
+        @endif
+
+        @if($sale->tax_amount > 0)
+        <tr>
+            <td>PPN (+)</td>
+            <td class="text-right">+ Rp {{ number_format($sale->tax_amount, 0, ',', '.') }}</td>
+        </tr>
+        @endif
+
+        <tr style="font-weight: bold;">
+            <td>TOTAL TAGIHAN</td>
+            <td class="text-right">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td>METODE BAYAR</td>
-            <td class="text-right uppercase">{{ $sale->payment_method }}</td>
+            <td class="text-right uppercase">{{ $sale->payment_method === 'credit' ? 'HUTANG/TEMPO' : $sale->payment_method }}</td>
         </tr>
         <tr>
-            <td>JUMLAH DIBAYAR</td>
+            <td>DIBAYAR</td>
             <td class="text-right">Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}</td>
         </tr>
         @if($sale->due_amount > 0)
+        <tr style="color: #b91c1c; font-weight: bold;">
+            <td>SISA PIUTANG (TEMPO)</td>
+            <td class="text-right">Rp {{ number_format($sale->due_amount, 0, ',', '.') }}</td>
+        </tr>
+        @elseif($sale->paid_amount > $sale->total_amount)
         <tr>
-            <td style="color:red;">SISA PIUTANG (HUTANG)</td>
-            <td class="text-right" style="color:red; font-weight:bold;">Rp {{ number_format($sale->due_amount, 0, ',', '.') }}</td>
+            <td>KEMBALIAN</td>
+            <td class="text-right">Rp {{ number_format($sale->paid_amount - $sale->total_amount, 0, ',', '.') }}</td>
         </tr>
         @endif
     </table>
@@ -138,8 +179,8 @@
     <div class="separator"></div>
 
     <div class="footer">
-        <p>Terima Kasih Atas Kunjungan Anda</p>
-        <p>Barang yang sudah dibeli tidak dapat ditukar/dikembalikan</p>
+        <p>{{ $footerText }}</p>
+        <p style="font-size:7px; color:#666;">Powered by KarsaERP</p>
     </div>
 </body>
 </html>

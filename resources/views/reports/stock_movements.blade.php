@@ -1,18 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-dark">Laporan Riwayat Stok</h2>
-            <div class="flex gap-1 text-[10px] overflow-x-auto">
-                <a href="{{ route('reports.sales') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Penjualan</a>
-                <a href="{{ route('reports.purchases') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Pembelian</a>
-                <a href="{{ route('reports.profit') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Laba Rugi</a>
-                <a href="{{ route('reports.debts') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Hutang</a>
-                <a href="{{ route('reports.stock_movements') }}" class="px-2 py-1 rounded bg-primary-600 text-white font-semibold">Riwayat Stok</a>
-            </div>
-        </div>
+        <h2 class="text-lg font-bold text-dark">Laporan Riwayat Stok</h2>
     </x-slot>
 
-    <div class="py-5 pb-24 space-y-4">
+    <div class="py-4 pb-12 space-y-4">
+        <x-inventory-subnav />
         {{-- Filter Card --}}
         <div class="glass-card p-4">
             <form action="{{ route('reports.stock_movements') }}" method="GET" class="space-y-3">
@@ -55,9 +47,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button type="submit" class="btn-primary py-2 text-xs flex-1">Filter</button>
-                    <a href="{{ route('reports.stock_movements') }}" class="btn-secondary py-2 text-xs text-center flex-1">Reset</a>
+                <div class="flex items-center gap-2 justify-end pt-1">
+                    <button type="submit" class="btn-primary py-2 px-6 text-xs">Filter</button>
+                    <a href="{{ route('reports.stock_movements') }}" class="btn-secondary py-2 px-4 text-xs text-center">Reset</a>
                 </div>
             </form>
         </div>

@@ -7,12 +7,12 @@
         <meta name="theme-color" content="#16a34a">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="POS Tani">
+        <meta name="apple-mobile-web-app-title" content="{{ \App\Models\Setting::get('company_name', 'KarsaERP') }}">
         <link rel="apple-touch-icon" href="/pwa-icon.png">
         <link rel="manifest" href="/manifest.json">
 
-        <title>{{ config('app.name', 'POS Toko Tani') }} - @yield('title', 'Dashboard')</title>
-        <meta name="description" content="Aplikasi POS Toko Pertanian - Kelola penjualan, pembelian, dan stok toko pertanian Anda">
+        <title>{{ \App\Models\Setting::get('company_name', 'KarsaERP') }} - @yield('title', 'Dashboard')</title>
+        <meta name="description" content="KarsaERP - Platform Cloud ERP & POS Multi-Usaha, Manajemen Stok, SDM & Payroll, Laporan Keuangan">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -152,45 +152,351 @@
             .flatpickr-day:hover {
                 background-color: #F3F4F6 !important;
             }
+            /* Custom scrollbar for offcanvas menu */
+            .admin-scrollbar::-webkit-scrollbar {
+                width: 5px;
+            }
+            .admin-scrollbar::-webkit-scrollbar-thumb {
+                background-color: rgba(156, 163, 175, 0.4);
+                border-radius: 9999px;
+            }
+            [x-cloak] { display: none !important; }
         </style>
 
         @stack('styles')
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen" style="background: linear-gradient(135deg, #FAFAF9 0%, #f0fdf4 30%, #FAFAF9 60%, #fff7ed 100%);">
+    <body class="font-sans antialiased" 
+          x-data="{ 
+              erpMenuOpen: false,
+              sidebarOpen: localStorage.getItem('erp_sidebar_open') !== null ? (localStorage.getItem('erp_sidebar_open') === 'true') : true,
+              toggleSidebar() {
+                  this.sidebarOpen = !this.sidebarOpen;
+                  localStorage.setItem('erp_sidebar_open', this.sidebarOpen);
+              }
+          }">
+        {{-- ================= ERP OFFCANVAS SIDEBAR (SISI KIRI) ================= --}}
+        <div x-show="erpMenuOpen" 
+             class="relative z-50" 
+             style="display: none;" 
+             role="dialog" 
+             aria-modal="true">
+             
+            {{-- Backdrop --}}
+            <div x-show="erpMenuOpen"
+                 x-transition:enter="transition-opacity ease-linear duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition-opacity ease-linear duration-300"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="erpMenuOpen = false"
+                 class="fixed inset-0 bg-gray-900/60 backdrop-blur-xs"></div>
 
-            {{-- Top Header --}}
-            <header class="sticky top-0 z-30 glass-nav transition-all duration-300"
-                    x-data="{ scrolled: false, pageTitle: 'POS Toko Tani' }"
-                    x-init="
-                        window.addEventListener('scroll', () => {
-                            scrolled = window.scrollY > 20;
-                        });
-                        
-                        // Extract page title dynamically
-                        setTimeout(() => {
-                            const headerContainer = document.querySelector('main')?.previousElementSibling;
-                            const h2El = headerContainer ? headerContainer.querySelector('h2') : null;
-                            if (h2El) {
-                                pageTitle = h2El.textContent.trim();
-                            } else {
-                                const parts = document.title.split('-');
-                                const rawTitle = parts[parts.length - 1]?.trim() || '';
-                                if (rawTitle && rawTitle !== 'POS Toko Tani') {
-                                    pageTitle = rawTitle;
-                                }
-                            }
-                        }, 100);
-                    ">
-                <div class="max-w-lg mx-auto px-3 py-3 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-float">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+            <div class="fixed inset-0 flex">
+                <div x-show="erpMenuOpen"
+                     x-transition:enter="transition ease-in-out duration-300 transform"
+                     x-transition:enter-start="-translate-x-full"
+                     x-transition:enter-end="translate-x-0"
+                     x-transition:leave="transition ease-in-out duration-300 transform"
+                     x-transition:leave-start="translate-x-0"
+                     x-transition:leave-end="-translate-x-full"
+                     class="relative mr-16 flex w-full max-w-xs sm:max-w-sm flex-1">
+                     
+                    <div class="flex flex-col w-full bg-white/95 backdrop-blur-2xl shadow-2xl border-r border-gray-200/80">
+                        {{-- Header Drawer --}}
+                        <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black text-sm shadow-md shadow-primary-500/20">
+                                    ERP
+                                </div>
+                                <div class="truncate max-w-[190px]">
+                                    <h2 class="font-bold text-sm text-dark leading-tight truncate">
+                                        {{ \App\Helpers\TenantHelper::currentBusiness()->name ?? \App\Models\Setting::get('company_name', 'KarsaERP') }}
+                                    </h2>
+                                    <p class="text-[10px] text-primary-600 font-semibold tracking-wide">Navigasi Modul ERP</p>
+                                </div>
+                            </div>
+                            <button type="button" @click="erpMenuOpen = false" class="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-white/80 transition shadow-xs" title="Tutup Menu">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        <div class="relative h-9 min-w-[150px] overflow-hidden">
-                            {{-- POS Toko Tani (Default State) --}}
+
+                        {{-- Nav Links List --}}
+                        <div class="flex-1 p-4 space-y-5 overflow-y-auto admin-scrollbar">
+                            {{-- Modul: Operasional Kasir & Toko --}}
+                            <div>
+                                <p class="px-2 text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                                    <span>🏪</span> Operasional Kasir & Toko
+                                </p>
+                                <div class="space-y-1">
+                                    <a href="{{ route('sales.create') }}" class="flex items-center justify-between p-2.5 rounded-lg text-xs font-bold transition {{ request()->routeIs('sales.create') ? 'bg-primary-50 text-primary-700 font-black' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-sm">🛒</span>
+                                            <span>Kasir POS Penjualan</span>
+                                        </div>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700">POS</span>
+                                    </a>
+                                    <a href="{{ route('sales.index') }}" class="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('sales.index', 'sales.show') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span class="text-sm">🧾</span>
+                                        <span>Riwayat Transaksi Jual</span>
+                                    </a>
+                                    <a href="{{ route('cash-registers.index') }}" class="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('cash-registers.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span class="text-sm">💼</span>
+                                        <span>Buka / Tutup Shift Kasir</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Modul: Laporan Keuangan Sederhana --}}
+                            <div class="border-t border-gray-100 pt-3">
+                                <p class="px-2 text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                                    <span>📊</span> Laporan Keuangan Akuntansi
+                                </p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="{{ route('financial-reports.profit-loss') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('financial-reports.profit-loss') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📈</span>
+                                        <span>Laba Rugi</span>
+                                    </a>
+                                    <a href="{{ route('financial-reports.cash-flow') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('financial-reports.cash-flow') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🌊</span>
+                                        <span>Arus Kas</span>
+                                    </a>
+                                    <a href="{{ route('financial-reports.balance-sheet') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('financial-reports.balance-sheet') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>⚖️</span>
+                                        <span>Neraca</span>
+                                    </a>
+                                    <a href="{{ route('financial-reports.general-ledger') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('financial-reports.general-ledger') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🏦</span>
+                                        <span>Buku Kas/Bank</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Modul: SDM & Penggajian --}}
+                            <div class="border-t border-gray-100 pt-3">
+                                <p class="px-2 text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                                    <span>👥</span> SDM & Penggajian (Payroll)
+                                </p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="{{ route('employees.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('employees.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>👤</span>
+                                        <span>Karyawan</span>
+                                    </a>
+                                    <a href="{{ route('employee-attendances.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('employee-attendances.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📅</span>
+                                        <span>Presensi</span>
+                                    </a>
+                                    <a href="{{ route('employee-bonuses.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('employee-bonuses.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🎁</span>
+                                        <span>Bonus/Komisi</span>
+                                    </a>
+                                    <a href="{{ route('payrolls.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('payrolls.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>💵</span>
+                                        <span>Slip Gaji</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Modul: Stok & Inventori --}}
+                            <div class="border-t border-gray-100 pt-3">
+                                <p class="px-2 text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                                    <span>📦</span> Stok & Inventori Barang
+                                </p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="{{ route('products.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('products.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📦</span>
+                                        <span>Master Produk</span>
+                                    </a>
+                                    <a href="{{ route('stock-adjustments.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('stock-adjustments.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📋</span>
+                                        <span>Stok Opname</span>
+                                    </a>
+                                    <a href="{{ route('reports.stock_movements') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('reports.stock_movements') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📜</span>
+                                        <span>Kartu Stok</span>
+                                    </a>
+                                    <a href="{{ route('categories.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('categories.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🗂️</span>
+                                        <span>Kategori</span>
+                                    </a>
+                                    <a href="{{ route('units.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('units.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>⚖️</span>
+                                        <span>Satuan (Unit)</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Modul: Pengadaan & Mitra Bisnis --}}
+                            <div class="border-t border-gray-100 pt-3">
+                                <p class="px-2 text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                                    <span>📥</span> Pengadaan & Mitra Bisnis
+                                </p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="{{ route('purchases.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('purchases.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📥</span>
+                                        <span>Pembelian</span>
+                                    </a>
+                                    <a href="{{ route('suppliers.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('suppliers.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🤝</span>
+                                        <span>Supplier</span>
+                                    </a>
+                                    <a href="{{ route('customers.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('customers.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>👥</span>
+                                        <span>Pelanggan</span>
+                                    </a>
+                                    <a href="{{ route('payments.suppliers') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('payments.suppliers*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>💸</span>
+                                        <span>Hutang Usaha</span>
+                                    </a>
+                                    <a href="{{ route('payments.customers') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('payments.customers*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>💰</span>
+                                        <span>Piutang</span>
+                                    </a>
+                                    <a href="{{ route('cash-transactions.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('cash-transactions.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>💵</span>
+                                        <span>Kas In / Out</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Modul: Konfigurasi Bisnis --}}
+                            <div class="border-t border-gray-100 pt-3">
+                                <p class="px-2 text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                                    <span>⚙️</span> Bisnis & Konfigurasi
+                                </p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <a href="{{ route('businesses.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('businesses.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🏢</span>
+                                        <span>Unit Usaha</span>
+                                    </a>
+                                    <a href="{{ route('settings.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('settings.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>⚙️</span>
+                                        <span>Pengaturan</span>
+                                    </a>
+                                    <a href="{{ route('users.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('users.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>👤</span>
+                                        <span>Staf / Kasir</span>
+                                    </a>
+                                    <a href="{{ route('galleries.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('galleries.*') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>🖼️</span>
+                                        <span>Galeri Foto</span>
+                                    </a>
+                                    <a href="{{ route('docs') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('docs') ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-700 hover:bg-gray-50' }}">
+                                        <span>📖</span>
+                                        <span>Buku Panduan</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Modul: Super Administrator Platform --}}
+                            @if(Auth::user()->isSuperAdmin())
+                                <div class="border-t border-purple-100 pt-3 bg-purple-50/50 -mx-4 px-4 py-3 rounded-xl">
+                                    <p class="px-2 text-[10px] font-black uppercase tracking-wider text-purple-700 mb-1.5 flex items-center gap-1">
+                                        <span>👑</span> Super Admin Platform
+                                    </p>
+                                    <div class="space-y-1">
+                                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 p-2 rounded-lg text-xs font-bold text-purple-800 bg-purple-100/70 hover:bg-purple-200/80 transition">
+                                            <span>📊</span>
+                                            <span>Dashboard Platform Global</span>
+                                        </a>
+                                        <div class="grid grid-cols-2 gap-1.5">
+                                            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-purple-700 hover:bg-purple-100/60 transition">
+                                                <span>👥</span>
+                                                <span>Semua User</span>
+                                            </a>
+                                            <a href="{{ route('admin.businesses.index') }}" class="flex items-center gap-2 p-2 rounded-lg text-xs font-semibold text-purple-700 hover:bg-purple-100/60 transition">
+                                                <span>🏢</span>
+                                                <span>Semua Tenant</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Footer Offcanvas (Profil Pengguna & Logout) --}}
+                        <div class="p-3 border-t border-gray-100 bg-gray-50/90 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <div class="w-8 h-8 rounded-lg bg-primary-100 text-primary-700 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <div class="truncate">
+                                    <p class="text-xs font-bold text-dark truncate">{{ Auth::user()->name }}</p>
+                                    <p class="text-[10px] text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <a href="{{ route('profile.edit') }}" class="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-white transition" title="Profil">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="p-1.5 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50 transition" title="Keluar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="min-h-screen flex" style="background: linear-gradient(135deg, #FAFAF9 0%, #f0fdf4 30%, #FAFAF9 60%, #fff7ed 100%);">
+
+            {{-- Desktop Left Sidebar (Collapsible) --}}
+            <x-desktop-sidebar />
+
+            {{-- Right Main Area Wrapper --}}
+            <div class="flex-1 flex flex-col min-w-0">
+
+                {{-- Top Header --}}
+                <header class="sticky top-0 z-30 glass-nav transition-all duration-300"
+                        x-data="{ scrolled: false, pageTitle: 'KarsaERP' }"
+                        x-init="
+                            window.addEventListener('scroll', () => {
+                                scrolled = window.scrollY > 20;
+                            });
+                            
+                            // Extract page title dynamically
+                            setTimeout(() => {
+                                const headerContainer = document.querySelector('main')?.previousElementSibling;
+                                const h2El = headerContainer ? headerContainer.querySelector('h2') : null;
+                                if (h2El) {
+                                    pageTitle = h2El.textContent.trim();
+                                } else {
+                                    const parts = document.title.split('-');
+                                    const rawTitle = parts[parts.length - 1]?.trim() || '';
+                                    if (rawTitle && rawTitle !== 'KarsaERP') {
+                                        pageTitle = rawTitle;
+                                    }
+                                }
+                            }, 100);
+                        ">
+                    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            {{-- Mobile ERP Drawer Button --}}
+                            <button type="button" @click="erpMenuOpen = true" class="lg:hidden w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-float hover:opacity-90 active:scale-95 transition cursor-pointer" title="Buka Menu Navigasi ERP">
+                                <span class="text-white font-black text-xs">ERP</span>
+                            </button>
+
+                            {{-- Desktop Sidebar Toggle Button --}}
+                            <button type="button" 
+                                    @click="toggleSidebar()" 
+                                    class="hidden lg:flex w-9 h-9 items-center justify-center rounded-xl bg-white/80 border border-gray-200/80 text-gray-600 hover:text-primary-600 hover:border-primary-300 shadow-xs active:scale-95 transition cursor-pointer" 
+                                    title="Toggle Sidebar">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                </svg>
+                            </button>
+                            <div class="relative h-9 min-w-[150px] overflow-hidden">
+                            {{-- KarsaERP (Default State) --}}
                             <div x-show="!scrolled" 
                                  x-transition:enter="transition ease-out duration-300 transform"
                                  x-transition:enter-start="opacity-0 translate-y-2"
@@ -199,8 +505,8 @@
                                  x-transition:leave-start="opacity-100 translate-y-0"
                                  x-transition:leave-end="opacity-0 -translate-y-2"
                                  class="absolute inset-y-0 left-0 flex flex-col justify-center">
-                                <h1 class="text-base font-bold text-dark leading-tight">POS Toko Tani</h1>
-                                <p class="text-[10px] text-gray-400 font-medium">Sistem Kasir Pertanian</p>
+                                <h1 class="text-base font-bold text-dark leading-tight">{{ \App\Models\Setting::get('company_name', 'KarsaERP') }}</h1>
+                                <p class="text-[10px] text-gray-400 font-medium">Platform Cloud ERP & POS</p>
                             </div>
 
                             {{-- Page Title (Scrolled State) --}}
@@ -219,44 +525,131 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        {{-- Profile Menu --}}
-                        <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" class="w-9 h-9 rounded-xl bg-white/60 border border-white/40 flex items-center justify-center transition-all hover:bg-white/80">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                            </button>
-                            <div x-show="open" @click.away="open = false"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-150"
-                                 x-transition:leave-start="opacity-100 scale-100"
-                                 x-transition:leave-end="opacity-0 scale-95"
-                                 class="absolute right-0 mt-2 w-48 glass-card-solid p-2 z-50">
-                                <div class="px-3 py-2 border-b border-gray-100 mb-1">
-                                    <p class="text-sm font-semibold text-dark">{{ Auth::user()->name }}</p>
-                                    <p class="text-xs text-gray-400">{{ Auth::user()->email }}</p>
-                                </div>
-                                <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    Profil
-                                </a>
-                                <a href="{{ route('settings.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                                    Pengaturan
-                                </a>
-                                <a href="{{ route('users.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.3" d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor"/>
-                                        <path d="M6 21C6 17.134 9.13401 14 13 14H11C7.13401 14 4 17.134 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                    Kelola Pengguna
-                                </a>
+                        @auth
+                            @php
+                                $currBiz = \App\Helpers\TenantHelper::currentBusiness();
+                                $userBusinesses = Auth::user()->allBusinesses();
+                            @endphp
 
+                            {{-- Active Business Switcher Dropdown --}}
+                            <div x-data="{ bizOpen: false }" class="relative">
+                                <button @click="bizOpen = !bizOpen" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/80 hover:bg-white border border-gray-200 text-xs font-semibold text-dark transition shadow-xs max-w-[130px] sm:max-w-[170px]" title="Unit Usaha Aktif">
+                                    <span class="text-sm">🏢</span>
+                                    <span class="truncate">{{ $currBiz ? $currBiz->name : 'Pilih Usaha' }}</span>
+                                    <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                <div x-show="bizOpen" @click.away="bizOpen = false"
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100 scale-100"
+                                     x-transition:leave-end="opacity-0 scale-95"
+                                     class="absolute right-0 mt-2 w-64 glass-card-solid p-2 z-50 rounded-xl shadow-xl border border-gray-100 divide-y divide-gray-100">
+                                    <div class="px-2 py-1.5 pb-2">
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Ganti Unit Usaha</p>
+                                        <p class="text-[11px] text-gray-500 truncate">Aktif: <strong class="text-dark">{{ $currBiz->name ?? 'Belum dipilih' }}</strong></p>
+                                    </div>
+                                    <div class="max-h-48 overflow-y-auto py-1 space-y-0.5">
+                                        @forelse($userBusinesses as $ub)
+                                             <form action="{{ route('businesses.switch', $ub) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="w-full text-left flex items-center justify-between p-2 rounded-lg text-xs transition {{ ($currBiz && $currBiz->id === $ub->id) ? 'bg-primary-50 text-primary-700 font-bold' : 'hover:bg-gray-50 text-gray-700' }}">
+                                                    <div class="flex items-center gap-2 truncate">
+                                                        <span>🏪</span>
+                                                        <span class="truncate">{{ $ub->name }}</span>
+                                                    </div>
+                                                    @if($currBiz && $currBiz->id === $ub->id)
+                                                        <span class="text-primary-600 text-xs font-black">✓</span>
+                                                    @endif
+                                                </button>
+                                            </form>
+                                        @empty
+                                            <p class="text-xs text-gray-400 p-2 text-center italic">Belum ada usaha</p>
+                                        @endforelse
+                                    </div>
+                                    <div class="pt-1.5 space-y-1">
+                                        <a href="{{ route('businesses.index') }}" class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">
+                                            <span>📂</span> Kelola Semua Usaha
+                                        </a>
+                                        <a href="{{ route('businesses.create') }}" class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-bold text-primary-600 hover:bg-primary-50">
+                                            <span>➕</span> Buat Usaha Baru
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+
+                            @php
+                                $activeRegister = \App\Models\CashRegister::currentOpenRegister();
+                            @endphp
+                            @if($activeRegister)
+                                <a href="{{ route('cash-registers.show', $activeRegister->id) }}" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold border border-emerald-200 shadow-sm animate-pulse" title="Shift Kasir Aktif">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span>Shift Aktif</span>
+                                </a>
+                            @endif
+
+                            {{-- Profile Menu --}}
+                            <div x-data="{ open: false }" class="relative">
+                                <button @click="open = !open" class="w-9 h-9 rounded-lg bg-white/60 border border-white/40 flex items-center justify-center transition-all hover:bg-white/80">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </button>
+                                <div x-show="open" @click.away="open = false"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="opacity-100 scale-100"
+                                     x-transition:leave-end="opacity-0 scale-95"
+                                     class="absolute right-0 mt-2 w-52 glass-card-solid p-2 z-50 rounded-xl shadow-xl border border-gray-100">
+                                    <div class="px-3 py-2 border-b border-gray-100 mb-1">
+                                        <p class="text-sm font-semibold text-dark">{{ Auth::user()->name }}</p>
+                                        <p class="text-xs text-gray-400">{{ Auth::user()->email }}</p>
+                                        <span class="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase rounded-md {{ Auth::user()->isSuperAdmin() ? 'bg-purple-100 text-purple-700' : 'bg-primary-100 text-primary-700' }}">
+                                            {{ Auth::user()->role }}
+                                        </span>
+                                    </div>
+
+                                    @if(Auth::user()->isSuperAdmin())
+                                        <div class="py-1 border-b border-gray-100 mb-1 space-y-0.5">
+                                            <p class="px-3 py-0.5 text-[9px] font-bold text-purple-600 uppercase tracking-wider">Super Admin Platform</p>
+                                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-3 py-1.5 text-xs text-purple-700 font-semibold rounded-lg hover:bg-purple-50 transition-colors">
+                                                <span>📊</span> Admin Dashboard
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        Profil Akun
+                                    </a>
+                                    <a href="{{ route('businesses.index') }}" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                                        <span>🏢</span> Kelola Bisnis Saya
+                                    </a>
+                                    <a href="{{ route('settings.index') }}" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                        Pengaturan Toko
+                                    </a>
+                                    <a href="{{ route('docs') }}" class="flex items-center gap-2 px-3 py-2 text-xs text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                        Buku Panduan (Docs)
+                                    </a>
+
+                                    <form method="POST" action="{{ route('logout') }}" class="pt-1 border-t border-gray-100 mt-1">
+                                        @csrf
+                                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                            Keluar / Logout
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endauth
                     </div>
                 </div>
             </header>
@@ -295,24 +688,25 @@
                 </script>
             @endif
 
-            @if (isset($header))
-                <div class="max-w-lg mx-auto px-3 pt-4">
-                    {{ $header }}
+            @if (isset($header) || View::hasSection('header'))
+                <div class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4">
+                    {{ $header ?? '' }}
+                    @yield('header')
                 </div>
             @endif
 
             {{-- Page Content --}}
-            <main class="max-w-lg mx-auto px-3 pb-24 pt-2 page-enter">
+            <main class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pb-36 lg:pb-16 pt-2 page-enter flex-1">
                 @yield('content')
                 {{ $slot ?? '' }}
             </main>
 
-            {{-- Floating Bottom Navigation --}}
-            <nav class="fixed bottom-0 left-0 right-0 z-40 px-3 pb-4">
-                <div class="max-w-lg mx-auto glass-nav rounded-2xl px-2 py-1">
+            {{-- Floating Bottom Navigation (Mobile Only) --}}
+            <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-4 pointer-events-none">
+                <div class="max-w-md sm:max-w-lg mx-auto glass-nav rounded-xl px-2 py-1 pointer-events-auto shadow-lg">
                     <div class="flex items-center justify-around">
                         {{-- Dashboard --}}
-                        <a href="{{ route('dashboard') }}" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('dashboard') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
+                        <a href="{{ route('dashboard') }}" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 group {{ request()->routeIs('dashboard') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
                             <div class="relative">
                                 <svg class="w-6 h-6 transition-colors {{ request()->routeIs('dashboard') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('dashboard') ? '2.5' : '2' }}" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -324,102 +718,62 @@
                             <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('dashboard') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Beranda</span>
                         </a>
 
-                        {{-- Jual (POS) --}}
-                        <a href="{{ route('sales.create') }}" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('sales.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
+                        {{-- Kasir POS --}}
+                        <a href="{{ route('sales.create') }}" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 group {{ request()->routeIs('sales.create') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
                             <div class="relative">
-                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('sales.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('sales.*') ? '2.5' : '2' }}" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
+                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('sales.create') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('sales.create') ? '2.5' : '2' }}" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
                                 </svg>
-                                @if(request()->routeIs('sales.*'))
+                                @if(request()->routeIs('sales.create'))
                                     <span class="absolute -top-1 -right-1 w-2 h-2 bg-accent-500 rounded-full"></span>
                                 @endif
                             </div>
-                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('sales.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Jual</span>
+                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('sales.create') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Kasir POS</span>
                         </a>
 
-                        {{-- Beli --}}
-                        <a href="{{ route('purchases.index') }}" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('purchases.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
+                        {{-- Stok & Opname --}}
+                        <a href="{{ route('stock-adjustments.index') }}" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 group {{ request()->routeIs('stock-adjustments.*', 'products.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
                             <div class="relative">
-                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('purchases.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('purchases.*') ? '2.5' : '2' }}" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('stock-adjustments.*', 'products.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('stock-adjustments.*') ? '2.5' : '2' }}" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                 </svg>
-                                @if(request()->routeIs('purchases.*'))
+                                @if(request()->routeIs('stock-adjustments.*'))
                                     <span class="absolute -top-1 -right-1 w-2 h-2 bg-accent-500 rounded-full"></span>
                                 @endif
                             </div>
-                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('purchases.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Beli</span>
+                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('stock-adjustments.*', 'products.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Stok</span>
                         </a>
 
-                        {{-- Galeri --}}
-                        <a href="{{ route('galleries.index') }}" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('galleries.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
+                        {{-- SDM & Penggajian --}}
+                        <a href="{{ route('payrolls.index') }}" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 group {{ request()->routeIs('payrolls.*', 'employees.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
                             <div class="relative">
-                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('galleries.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('galleries.*') ? '2.5' : '2' }}" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('payrolls.*', 'employees.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('payrolls.*', 'employees.*') ? '2.5' : '2' }}" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
-                                @if(request()->routeIs('galleries.*'))
+                                @if(request()->routeIs('payrolls.*', 'employees.*'))
                                     <span class="absolute -top-1 -right-1 w-2 h-2 bg-accent-500 rounded-full"></span>
                                 @endif
                             </div>
-                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('galleries.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Galeri</span>
+                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('payrolls.*', 'employees.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">SDM / Gaji</span>
                         </a>
 
-                        {{-- More --}}
-                        <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
-                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        {{-- Menu Utama / ERP Offcanvas Trigger --}}
+                        <button type="button" @click="erpMenuOpen = true" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 group {{ request()->routeIs('financial-reports.*', 'cash-registers.*', 'purchases.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}" title="Buka Menu ERP">
+                            <div class="relative">
+                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('financial-reports.*', 'cash-registers.*', 'purchases.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                                 </svg>
-                                <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Lainnya</span>
-                            </button>
-                            {{-- More Menu Popup --}}
-                            <div x-show="open" @click.away="open = false"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 translate-y-4"
-                                 x-transition:enter-end="opacity-100 translate-y-0"
-                                 x-transition:leave="transition ease-in duration-150"
-                                 x-transition:leave-start="opacity-100 translate-y-0"
-                                 x-transition:leave-end="opacity-0 translate-y-4"
-                                 class="absolute bottom-16 right-0 w-56 glass-card-solid p-2 z-50">
-                                <a href="{{ route('products.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('products.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">📦</span> Produk
-                                </a>
-                                <a href="{{ route('categories.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('categories.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">🏷️</span> Kategori
-                                </a>
-                                <a href="{{ route('units.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('units.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">📏</span> Satuan
-                                </a>
-                                <a href="{{ route('suppliers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('suppliers.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">🤝</span> Tengkulak
-                                </a>
-                                <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('customers.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">👥</span> Pelanggan
-                                </a>
-                                <a href="{{ route('reports.sales') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('reports.sales', 'reports.purchases', 'reports.profit', 'reports.debts') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">📊</span> Laporan
-                                </a>
-                                <a href="{{ route('reports.stock_movements') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('reports.stock_movements') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">📜</span> Riwayat Stok
-                                </a>
-                                <div class="border-t border-gray-100 my-1"></div>
-                                <a href="{{ route('payments.suppliers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('payments.suppliers*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">💸</span> Hutang Tengkulak
-                                </a>
-                                <a href="{{ route('payments.customers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('payments.customers*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">💰</span> Piutang Pelanggan
-                                </a>
-                                <a href="{{ route('cash-transactions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('cash-transactions.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">🏦</span> Kas
-                                </a>
-                                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('users.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                    <span class="text-lg">👤</span> Pengguna
-                                </a>
+                                @if(request()->routeIs('financial-reports.*', 'cash-registers.*', 'purchases.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*'))
+                                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-accent-500 rounded-full"></span>
+                                @endif
                             </div>
-                        </div>
+                            <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('financial-reports.*', 'cash-registers.*', 'purchases.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Menu ERP</span>
+                        </button>
                     </div>
                 </div>
             </nav>
-        </div>
+        </div> {{-- Close right main area wrapper --}}
+    </div> {{-- Close min-h-screen flex --}}
 
         {{-- Global Alpine.js helper for currency formatting --}}
         <script>

@@ -1,236 +1,186 @@
-@push('styles')
-<style>
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-    .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-</style>
-@endpush
+@extends('layouts.app')
 
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
+@section('title', 'Dashboard ERP')
+
+@section('content')
+<div class="space-y-4">
+    {{-- Header Banner & Quick Shift --}}
+    <div class="glass-card-solid p-4 rounded-xl border border-white/60 shadow-sm relative overflow-hidden bg-gradient-to-r from-emerald-600 via-primary-600 to-teal-700 text-white">
+        <div class="relative z-10 flex items-center justify-between">
             <div>
-                <h2 class="text-lg font-bold text-dark">Selamat Datang! 👋</h2>
-                <p class="text-sm text-gray-500">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</p>
+                <p class="text-xs text-emerald-100 font-medium">Selamat Datang,</p>
+                <h2 class="text-lg font-bold">{{ Auth::user()->name }}</h2>
+                <p class="text-[11px] text-emerald-100 mt-0.5">{{ \App\Models\Setting::get('company_name', 'KarsaERP') }} &bull; {{ date('d F Y') }}</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            </div>
-        </div>
-    </x-slot>
-
-    <div class="py-5 pb-24 space-y-5">
-        {{-- Sliding Stat Cards using Native CSS Scroll Snap --}}
-        <div x-data="{ 
-                 activeSlide: 0, 
-                 totalSlides: 4,
-                 autoplayInterval: null,
-                 isScrolling: false,
-                 startAutoplay() {
-                     this.stopAutoplay();
-                     this.autoplayInterval = setInterval(() => {
-                         const next = (this.activeSlide + 1) % this.totalSlides;
-                         this.selectSlide(next);
-                     }, 4000);
-                 },
-                 stopAutoplay() {
-                     if (this.autoplayInterval) {
-                         clearInterval(this.autoplayInterval);
-                         this.autoplayInterval = null;
-                     }
-                 },
-                 selectSlide(index) {
-                     this.stopAutoplay();
-                     this.activeSlide = index;
-                     const el = this.$refs.slider;
-                     if (el) {
-                         const slideEl = el.querySelector('.snap-center');
-                         if (slideEl) {
-                             const slideWidth = slideEl.offsetWidth;
-                             // Prevent scroll listener from trigger loops during animation
-                             this.isScrolling = true;
-                             el.scrollTo({ left: index * slideWidth, behavior: 'smooth' });
-                             setTimeout(() => { this.isScrolling = false; }, 400);
-                         }
-                     }
-                     this.startAutoplay();
-                 },
-                 updateActiveSlide() {
-                     if (this.isScrolling) return;
-                     const el = this.$refs.slider;
-                     if (el) {
-                         const slideEl = el.querySelector('.snap-center');
-                         if (slideEl) {
-                             const slideWidth = slideEl.offsetWidth;
-                             const index = Math.round(el.scrollLeft / slideWidth);
-                             if (this.activeSlide !== index && index >= 0 && index < this.totalSlides) {
-                                 this.activeSlide = index;
-                             }
-                         }
-                     }
-                 }
-             }"
-             x-init="startAutoplay()"
-             class="w-full relative select-none">
-             
-             <!-- Scrollable snap-x Container (using spacer elements for cross-browser centering, w-full removed to allow negative margins to stretch container fully) -->
-             <div x-ref="slider"
-                  @scroll="updateActiveSlide()"
-                  @touchstart="stopAutoplay()"
-                  @touchend="startAutoplay()"
-                  class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth py-2 -mx-3 no-scrollbar"
-                  style="scrollbar-width: none; -ms-overflow-style: none;">
-                  
-                  <!-- Spacer Start -->
-                  <div class="shrink-0" style="width: 2%"></div>
-                  
-                  {{-- Slide 1: Penjualan Hari Ini --}}
-                  <div class="shrink-0 snap-center px-2" style="width: 96%">
-                      <div class="p-5 rounded-glass border border-white/40 shadow-glass bg-gradient-to-br from-white/75 to-emerald-50/40 relative overflow-hidden" style="backdrop-filter: blur(12px);">
-                          <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-xl"></div>
-                          <div class="flex items-center justify-between mb-3">
-                              <span class="text-xs font-bold text-emerald-700 tracking-wide uppercase">Penjualan Hari Ini</span>
-                              <div class="w-9 h-9 rounded-xl bg-emerald-100/80 flex items-center justify-center shadow-sm">
-                                  <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                              </div>
-                          </div>
-                          <p class="text-2xl font-extrabold text-dark tracking-tight">Rp {{ number_format($todaySales ?? 0, 0, ',', '.') }}</p>
-                          <p class="text-[10px] text-gray-400 mt-2">Akumulasi omset dari penjualan yang diselesaikan hari ini</p>
-                      </div>
-                  </div>
-
-                  {{-- Slide 2: Transaksi Hari Ini --}}
-                  <div class="shrink-0 snap-center px-2" style="width: 96%">
-                      <div class="p-5 rounded-glass border border-white/40 shadow-glass bg-gradient-to-br from-white/75 to-blue-50/40 relative overflow-hidden" style="backdrop-filter: blur(12px);">
-                          <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-blue-500/10 blur-xl"></div>
-                          <div class="flex items-center justify-between mb-3">
-                              <span class="text-xs font-bold text-blue-700 tracking-wide uppercase">Transaksi Hari Ini</span>
-                              <div class="w-9 h-9 rounded-xl bg-blue-100/80 flex items-center justify-center shadow-sm">
-                                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                              </div>
-                          </div>
-                          <p class="text-2xl font-extrabold text-dark tracking-tight">{{ $todayTransactions ?? 0 }} <span class="text-sm font-normal text-gray-400">Nota</span></p>
-                          <p class="text-[10px] text-gray-400 mt-2">Jumlah nota kasir yang berhasil diproses hari ini</p>
-                      </div>
-                  </div>
-
-                  {{-- Slide 3: Total Piutang --}}
-                  <div class="shrink-0 snap-center px-2" style="width: 96%">
-                      <div class="p-5 rounded-glass border border-white/40 shadow-glass bg-gradient-to-br from-white/75 to-orange-50/40 relative overflow-hidden" style="backdrop-filter: blur(12px);">
-                          <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-orange-500/10 blur-xl"></div>
-                          <div class="flex items-center justify-between mb-3">
-                              <span class="text-xs font-bold text-orange-700 tracking-wide uppercase">Total Piutang (Receivables)</span>
-                              <div class="w-9 h-9 rounded-xl bg-orange-100/80 flex items-center justify-center shadow-sm">
-                                  <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
-                              </div>
-                          </div>
-                          <p class="text-2xl font-extrabold text-orange-600 tracking-tight">Rp {{ number_format($totalReceivables ?? 0, 0, ',', '.') }}</p>
-                          <p class="text-[10px] text-gray-400 mt-2">Tagihan piutang dari pelanggan yang belum dibayar</p>
-                      </div>
-                  </div>
-
-                  {{-- Slide 4: Total Hutang --}}
-                  <div class="shrink-0 snap-center px-2" style="width: 96%">
-                      <div class="p-5 rounded-glass border border-white/40 shadow-glass bg-gradient-to-br from-white/75 to-red-50/40 relative overflow-hidden" style="backdrop-filter: blur(12px);">
-                          <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-red-500/10 blur-xl"></div>
-                          <div class="flex items-center justify-between mb-3">
-                              <span class="text-xs font-bold text-red-700 tracking-wide uppercase">Total Hutang (Payables)</span>
-                              <div class="w-9 h-9 rounded-xl bg-red-100/80 flex items-center justify-center shadow-sm">
-                                  <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                              </div>
-                          </div>
-                          <p class="text-2xl font-extrabold text-red-600 tracking-tight">Rp {{ number_format($totalPayables ?? 0, 0, ',', '.') }}</p>
-                          <p class="text-[10px] text-gray-400 mt-2">Tunggakan hutang pembelian ke supplier/tengkulak</p>
-                      </div>
-                  </div>
-                  
-                  <!-- Spacer End -->
-                  <div class="shrink-0" style="width: 2%"></div>
-             </div>
-
-             <!-- Indicator Dots -->
-             <div class="flex justify-center gap-1.5 mt-3.5">
-                 <template x-for="i in totalSlides" :key="i - 1">
-                     <button @click="selectSlide(i - 1)" 
-                             class="h-1.5 rounded-full transition-all duration-200"
-                             :class="activeSlide === (i - 1) ? 'w-4 bg-primary-600' : 'w-1.5 bg-gray-300'"></button>
-                 </template>
-             </div>
-        </div>
-
-        {{-- Low Stock Alert --}}
-        @if(isset($lowStockProducts) && $lowStockProducts->count() > 0)
-        <div class="rounded-glass border border-white/40 shadow-glass overflow-hidden" style="background: rgba(255,255,255,0.6); backdrop-filter: blur(12px);">
-            <div class="px-4 py-3 border-b border-white/30 flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center">
-                    <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-                </div>
-                <h3 class="text-sm font-semibold text-dark">Stok Menipis</h3>
-                <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">{{ $lowStockProducts->count() }}</span>
-            </div>
-            <div class="divide-y divide-gray-100">
-                @foreach($lowStockProducts as $product)
-                <div class="px-4 py-3 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" class="w-full h-full object-cover" alt="{{ $product->name }}">
-                            @else
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            @endif
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-dark">{{ $product->name }}</p>
-                            <p class="text-xs text-gray-400">Min: {{ $product->min_stock }} {{ $product->sellUnit->symbol ?? '' }}</p>
-                        </div>
-                    </div>
-                    <span class="text-sm font-bold text-red-600">{{ $product->stock }} <span class="text-xs font-normal">{{ $product->sellUnit->symbol ?? '' }}</span></span>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-
-        {{-- Recent Sales --}}
-        <div class="rounded-glass border border-white/40 shadow-glass overflow-hidden" style="background: rgba(255,255,255,0.6); backdrop-filter: blur(12px);">
-            <div class="px-4 py-3 border-b border-white/30 flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-dark">Penjualan Terbaru</h3>
-                <a href="{{ route('sales.index') }}" class="text-xs text-primary-600 font-medium">Lihat Semua →</a>
-            </div>
-            <div class="divide-y divide-gray-100">
-                @forelse($recentSales ?? [] as $sale)
-                <a href="{{ route('sales.show', $sale) }}" class="px-4 py-3 flex items-center justify-between hover:bg-white/40 transition-colors">
-                    <div>
-                        <p class="text-sm font-medium text-dark">{{ $sale->invoice_number }}</p>
-                        <p class="text-xs text-gray-400">{{ $sale->created_at->locale('id')->diffForHumans() }}
-                            @if($sale->customer)
-                                · {{ $sale->customer->name }}
-                            @endif
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-dark">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</p>
-                        @if($sale->payment_status === 'paid')
-                            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700">Lunas</span>
-                        @elseif($sale->payment_status === 'partial')
-                            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Sebagian</span>
-                        @else
-                            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700">Belum Bayar</span>
-                        @endif
-                    </div>
-                </a>
-                @empty
-                <div class="px-4 py-8 text-center">
-                    <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    <p class="text-sm text-gray-400">Belum ada penjualan hari ini</p>
-                </div>
-                @endforelse
+            <div>
+                @if($currentRegister)
+                    <a href="{{ route('cash-registers.show', $currentRegister->id) }}" class="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-xs font-semibold border border-white/30 flex items-center gap-1.5 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-emerald-300 animate-ping"></span>
+                        <span>Shift Terbuka</span>
+                    </a>
+                @else
+                    <a href="{{ route('cash-registers.index') }}" class="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-gray-900 text-xs font-bold shadow transition-all flex items-center gap-1">
+                        <span>🔓 Buka Kasir</span>
+                    </a>
+                @endif
             </div>
         </div>
     </div>
-</x-app-layout>
 
+    {{-- Main Financial KPI Grid --}}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {{-- Penjualan Hari Ini --}}
+        <div class="glass-card-solid p-3.5 rounded-xl border border-gray-100/80 shadow-sm min-w-0">
+            <div class="flex items-center justify-between text-gray-500 mb-1">
+                <span class="text-xs font-medium truncate">Penjualan Hari Ini</span>
+                <span class="text-xs p-1 rounded-lg bg-emerald-50 text-emerald-600 flex-shrink-0">🛒</span>
+            </div>
+            <p class="text-base font-extrabold text-dark truncate" title="Rp {{ number_format($todaySales, 0, ',', '.') }}">Rp {{ number_format($todaySales, 0, ',', '.') }}</p>
+            <p class="text-[10px] text-gray-400 mt-0.5 truncate">{{ $todayTransactions }} transaksi hari ini</p>
+        </div>
+
+        {{-- Kas & Bank Berjalan --}}
+        <div class="glass-card-solid p-3.5 rounded-xl border border-gray-100/80 shadow-sm min-w-0">
+            <div class="flex items-center justify-between text-gray-500 mb-1">
+                <span class="text-xs font-medium truncate">Total Kas & Bank</span>
+                <span class="text-xs p-1 rounded-lg bg-blue-50 text-blue-600 flex-shrink-0">🏦</span>
+            </div>
+            <p class="text-base font-extrabold text-dark truncate" title="Rp {{ number_format($totalCash, 0, ',', '.') }}">Rp {{ number_format($totalCash, 0, ',', '.') }}</p>
+            <a href="{{ route('financial-reports.general-ledger') }}" class="text-[10px] text-primary-600 font-semibold hover:underline mt-0.5 block truncate">Lihat Buku Kas &rarr;</a>
+        </div>
+
+        {{-- Piutang Pelanggan --}}
+        <div class="glass-card-solid p-3.5 rounded-xl border border-gray-100/80 shadow-sm min-w-0">
+            <div class="flex items-center justify-between text-gray-500 mb-1">
+                <span class="text-xs font-medium truncate">Piutang Pelanggan</span>
+                <span class="text-xs p-1 rounded-lg bg-amber-50 text-amber-600 flex-shrink-0">⏳</span>
+            </div>
+            <p class="text-base font-extrabold text-amber-600 truncate" title="Rp {{ number_format($totalReceivables, 0, ',', '.') }}">Rp {{ number_format($totalReceivables, 0, ',', '.') }}</p>
+            <a href="{{ route('payments.customers') }}" class="text-[10px] text-gray-400 hover:text-primary-600 mt-0.5 block truncate">Penagihan Piutang &rarr;</a>
+        </div>
+
+        {{-- Hutang Supplier --}}
+        <div class="glass-card-solid p-3.5 rounded-xl border border-gray-100/80 shadow-sm min-w-0">
+            <div class="flex items-center justify-between text-gray-500 mb-1">
+                <span class="text-xs font-medium truncate">Hutang ke Supplier</span>
+                <span class="text-xs p-1 rounded-lg bg-red-50 text-red-600 flex-shrink-0">📑</span>
+            </div>
+            <p class="text-base font-extrabold text-red-600 truncate" title="Rp {{ number_format($totalPayables, 0, ',', '.') }}">Rp {{ number_format($totalPayables, 0, ',', '.') }}</p>
+            <a href="{{ route('payments.suppliers') }}" class="text-[10px] text-gray-400 hover:text-primary-600 mt-0.5 block truncate">Pelunasan Hutang &rarr;</a>
+        </div>
+    </div>
+
+    {{-- Lower Dashboard Responsive 2-Column Section on Desktop --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        {{-- Left Column (Shortcuts & Recent Transactions) --}}
+        <div class="lg:col-span-2 space-y-4">
+            {{-- Quick Shortcuts Grid --}}
+            <div class="glass-card-solid p-3.5 rounded-xl border border-gray-100 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Akses Cepat Modul ERP</h3>
+                <div class="grid grid-cols-4 gap-2 text-center">
+                    <a href="{{ route('sales.create') }}" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg mb-1 group-hover:scale-105 transition-transform">
+                            🛒
+                        </div>
+                        <span class="text-[11px] font-semibold text-gray-700">Kasir</span>
+                    </a>
+
+                    <a href="{{ route('stock-adjustments.create') }}" class="flex flex-col items-center p-2 rounded-lg hover:bg-blue-50 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-lg mb-1 group-hover:scale-105 transition-transform">
+                            📋
+                        </div>
+                        <span class="text-[11px] font-semibold text-gray-700">Opname</span>
+                    </a>
+
+                    <a href="{{ route('payrolls.index') }}" class="flex flex-col items-center p-2 rounded-lg hover:bg-purple-50 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-lg mb-1 group-hover:scale-105 transition-transform">
+                            👥
+                        </div>
+                        <span class="text-[11px] font-semibold text-gray-700">Gaji SDM</span>
+                    </a>
+
+                    <a href="{{ route('financial-reports.profit-loss') }}" class="flex flex-col items-center p-2 rounded-lg hover:bg-amber-50 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-lg mb-1 group-hover:scale-105 transition-transform">
+                            📈
+                        </div>
+                        <span class="text-[11px] font-semibold text-gray-700">Laba Rugi</span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Recent Transactions --}}
+            <div class="glass-card-solid p-3.5 rounded-xl border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-2.5">
+                    <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Penjualan Terakhir</h3>
+                    <a href="{{ route('sales.index') }}" class="text-[10px] text-primary-600 font-semibold hover:underline">Lihat Semua</a>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @forelse($recentSales as $sale)
+                        <div class="py-2 flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-xs text-dark">{{ $sale->invoice_number }}</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold {{ $sale->payment_method === 'cash' ? 'bg-emerald-50 text-emerald-700' : ($sale->payment_method === 'credit' ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700') }}">
+                                        {{ strtoupper($sale->payment_method) }}
+                                    </span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-0.5">{{ $sale->customer?->name ?? 'Pelanggan Umum' }} &bull; {{ $sale->sale_date->format('H:i') }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs font-extrabold text-dark">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</p>
+                                <a href="{{ route('sales.show', $sale) }}" class="text-[10px] text-primary-600 hover:underline">Detail</a>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-xs text-gray-400 text-center py-3">Belum ada transaksi penjualan hari ini.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        {{-- Right Column (HR / Payroll Banner & Low Stock Warning) --}}
+        <div class="space-y-4">
+            {{-- HR & Payroll Notification Banner --}}
+            <div class="glass-card-solid p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                        {{ $activeEmployees }}
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Karyawan Aktif</p>
+                        <p class="text-[10px] text-gray-400">Gaji Pending: Rp {{ number_format($payrollPending, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+                <a href="{{ route('payrolls.index') }}" class="px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-colors">
+                    Kelola Gaji &rarr;
+                </a>
+            </div>
+
+            {{-- Low Stock Warning Alert --}}
+            @if($lowStockProducts->isNotEmpty())
+                <div class="glass-card-solid p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/40 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                            <span>⚠️</span> Peringatan Stok Menipis ({{ $lowStockProducts->count() }})
+                        </h3>
+                        <a href="{{ route('stock-adjustments.create', ['type' => 'in_manual']) }}" class="text-[10px] text-amber-800 font-bold hover:underline">+ Tambah Stok</a>
+                    </div>
+                    <div class="divide-y divide-amber-100">
+                        @foreach($lowStockProducts->take(4) as $prod)
+                            <div class="py-1.5 flex items-center justify-between text-xs">
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ $prod->name }}</p>
+                                    <p class="text-[10px] text-gray-400">Min. {{ $prod->min_stock }} {{ $prod->sellUnit?->symbol }}</p>
+                                </div>
+                                <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-extrabold text-xs">
+                                    Sisa: {{ $prod->stock }} {{ $prod->sellUnit?->symbol }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection

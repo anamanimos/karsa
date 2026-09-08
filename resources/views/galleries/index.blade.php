@@ -22,6 +22,8 @@
          @scroll.window.debounce.100ms="checkScroll()"
          @open-label-filter-modal.window="showLabelFilterModal = true">
 
+        <x-settings-subnav />
+
         {{-- Upload Section --}}
         <div class="glass-card p-4">
             <form action="{{ route('galleries.store') }}" method="POST" enctype="multipart/form-data" id="upload-form">
@@ -115,9 +117,9 @@
                 Tidak ada berkas gambar yang ditemukan.
             </div>
         @else
-            <div class="grid grid-cols-3 gap-[2px] -mx-3 overflow-hidden bg-gray-200">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-1.5 rounded-lg overflow-hidden bg-gray-100 p-1.5">
                 <template x-for="(gallery, index) in items" :key="gallery.id">
-                    <div class="aspect-square bg-white relative group overflow-hidden cursor-pointer"
+                    <div class="aspect-square bg-white relative group overflow-hidden cursor-pointer rounded"
                          @click="openGalleryPreview(index)">
                         {{-- Image Element --}}
                         <img :src="gallery.url" 
@@ -545,10 +547,10 @@
              x-transition:leave-end="opacity-0 translate-y-10 scale-95"
              class="fixed bottom-40 left-0 right-0 z-40 px-5 pointer-events-none"
              style="display: none;">
-            <div class="max-w-lg mx-auto flex justify-end">
+            <div class="max-w-7xl mx-auto flex justify-end sm:px-6 lg:px-8">
                 <button type="button" 
                         @click="document.getElementById('main-file-input').click()"
-                        class="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto"
+                        class="w-12 h-12 rounded-xl bg-white/80 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto"
                         title="Unggah Gambar Baru">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -559,9 +561,9 @@
 
         {{-- 2. Floating search button (placed at the bottom, bottom-24) --}}
         <div class="fixed bottom-24 left-0 right-0 z-40 px-5 pointer-events-none">
-            <div class="max-w-lg mx-auto relative flex justify-end h-12">
-                <div class="absolute right-0 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-full overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
-                     :class="openFloatingSearch ? 'w-full h-12' : 'w-12 h-12'">
+            <div class="max-w-7xl mx-auto relative flex justify-end h-12 sm:px-6 lg:px-8">
+                <div class="absolute right-0 sm:right-6 lg:right-8 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-xl overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
+                     :class="openFloatingSearch ? 'w-full sm:max-w-md h-12' : 'w-12 h-12'">
                      
                      {{-- Collapsed Button --}}
                      <button type="button" x-show="!openFloatingSearch"
@@ -598,11 +600,11 @@
 
         {{-- Floating action buttons (Top Right, top-16) --}}
         <div class="fixed top-16 left-0 right-0 z-40 px-5 pointer-events-none">
-            <div class="max-w-lg mx-auto flex justify-end gap-2.5">
+            <div class="max-w-7xl mx-auto flex justify-end gap-2.5 sm:px-6 lg:px-8">
                 
                 {{-- 2. Floating sort button (placed on the left of status) --}}
                 <button type="button" @click="showSortModal = true"
-                        class="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto relative"
+                        class="w-12 h-12 rounded-xl bg-white/80 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto relative"
                         title="Urutkan Gambar">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h5M17 14v7m0 0l-3-3m3 3l3-3M21 10V3m0 0l-3 3m3-3l3 3"/>

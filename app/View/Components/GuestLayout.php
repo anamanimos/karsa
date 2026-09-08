@@ -7,6 +7,13 @@ use Illuminate\View\View;
 
 class GuestLayout extends Component
 {
+    public string $maxWidth;
+
+    public function __construct(string $maxWidth = 'max-w-md')
+    {
+        $this->maxWidth = $maxWidth;
+    }
+
     /**
      * Get the view / contents that represents the component.
      */

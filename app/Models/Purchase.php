@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,9 +11,10 @@ use Carbon\Carbon;
 
 class Purchase extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToBusiness;
+
     protected $fillable = [
-        'invoice_number', 'supplier_id', 'purchase_date', 'total_amount',
+        'business_id', 'invoice_number', 'supplier_id', 'purchase_date', 'total_amount',
         'payment_status', 'paid_amount', 'due_amount', 'notes', 'created_by',
         'supplier_invoice_number', 'invoice_image', 'additional_cost', 'additional_cost_notes'
     ];

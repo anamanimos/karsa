@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    use BelongsToBusiness;
+
     protected $fillable = [
-        'category_id', 'sku', 'name', 'buy_unit_id', 'sell_unit_id',
+        'business_id', 'category_id', 'sku', 'name', 'buy_unit_id', 'sell_unit_id',
         'conversion_factor', 'last_purchase_price', 'avg_purchase_price',
         'selling_price', 'stock', 'min_stock', 'image', 'notes', 'is_active'
     ];

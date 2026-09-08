@@ -1,11 +1,37 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-bold text-dark">Kasir Jual Barang</h2>
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-dark">Kasir POS (Point of Sale)</h2>
+                <p class="text-xs text-gray-500">
+                    Kasir: <strong class="text-primary-700">{{ auth()->user()->name }}</strong>
+                    @if($currentRegister)
+                        • <span class="text-emerald-600 font-semibold">Shift Aktif</span>
+                    @else
+                        • <span class="text-amber-600 font-semibold">Shift Belum Dibuka</span>
+                    @endif
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+                @if($currentRegister)
+                    <a href="{{ route('cash-registers.show', $currentRegister->id) }}" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Shift Kasir
+                    </a>
+                @else
+                    <a href="{{ route('cash-registers.index') }}" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 transition flex items-center gap-1">
+                        ⚠️ Buka Shift
+                    </a>
+                @endif
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-3 pb-28 max-w-lg mx-auto" x-data="posSystem()">
-        {{-- Tanggal Penjualan Control Bar --}}
-        <div class="card-solid p-3 mb-3 bg-white flex items-center justify-between gap-2 shadow-sm rounded-xl">
+    <div class="py-3 pb-28 max-w-7xl mx-auto" x-data="posSystem()">
+        <x-sales-subnav />
+        {{-- Tanggal Penjualan & Kasir Bar --}}
+        <div class="card-solid p-3 mb-3 bg-white flex items-center justify-between gap-2 shadow-sm rounded-lg">
             <div class="flex items-center gap-2 text-dark font-bold text-xs">
                 <!-- Duotone Icon: Calendar -->
                 <svg class="w-4 h-4 text-primary-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,10 +44,10 @@
         </div>
 
         {{-- Product Grid --}}
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             <template x-for="product in filteredProducts()" :key="product.id">
                 <div @click="addToCart(product)"
-                      class="card-solid overflow-hidden block active:scale-95 transition-all duration-150 cursor-pointer select-none bg-white">
+                      class="card-solid overflow-hidden block active:scale-95 transition-all duration-150 cursor-pointer select-none bg-white rounded-lg">
                     <div class="aspect-square bg-gray-100 relative">
                         <template x-if="product.image">
                             <img :src="'/storage/' + product.image" class="w-full h-full object-cover" :alt="product.name">
@@ -31,7 +57,7 @@
                                 <!-- Duotone Icon: Package -->
                                 <svg class="w-10 h-10 text-gray-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.3" d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
-                                    <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17M2 12L17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </div>
@@ -41,7 +67,7 @@
                               x-text="product.category"></span>
                         {{-- Stock Badge --}}
                         <span :class="product.stock <= 0 ? 'bg-red-500 text-white' : 'bg-primary-100 text-primary-700'"
-                              class="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
+                              class="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded font-semibold"
                               x-text="'Stok: ' + formatNumber(product.stock / product.conversion_factor) + ' ' + product.sell_unit"></span>
                     </div>
                     <div class="p-3 space-y-1">
@@ -58,7 +84,7 @@
              x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
-             class="bottom-sheet">
+             class="bottom-sheet max-w-2xl mx-auto sm:rounded-2xl sm:bottom-6 sm:border sm:shadow-2xl">
             <div class="bottom-sheet-handle"></div>
             
             {{-- Header --}}
@@ -71,14 +97,14 @@
                         <circle cx="9" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
                         <circle cx="17" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
                     </svg>
-                    <h3 class="text-sm font-bold text-dark">Keranjang</h3>
+                    <h3 class="text-sm font-bold text-dark">Keranjang Kasir</h3>
                     <span class="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full" x-text="cart.length + ' item'"></span>
                 </div>
                 <button @click="openCart = false" class="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors">Tutup</button>
             </div>
 
             {{-- Cart Item List --}}
-            <div class="max-h-[40vh] overflow-y-auto">
+            <div class="max-h-[35vh] overflow-y-auto">
                 <template x-for="(item, idx) in cart" :key="item.id">
                     <div class="px-4 py-3 border-b border-gray-100/80">
                         {{-- Row 1: Product name + delete --}}
@@ -96,7 +122,7 @@
                             </button>
                         </div>
 
-                        {{-- Row 2: Price input + Qty stepper (side by side) --}}
+                        {{-- Row 2: Price input + Qty stepper --}}
                         <div class="flex items-center gap-2">
                             {{-- Editable Price --}}
                             <div class="flex-1 min-w-0">
@@ -127,10 +153,29 @@
 
             {{-- Checkout Form --}}
             <div class="p-4 space-y-3">
-                {{-- Total --}}
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-gray-500">Total Belanja</span>
-                    <span class="text-base font-extrabold text-primary-600" x-text="formatRupiah(totalCart())"></span>
+                {{-- Subtotal, Discount & Tax Calculation --}}
+                <div class="p-3 bg-gray-50 rounded-xl space-y-2 text-xs">
+                    <div class="flex items-center justify-between text-gray-600">
+                        <span>Subtotal Belanja:</span>
+                        <span class="font-bold text-dark" x-text="formatRupiah(subtotalCart())"></span>
+                    </div>
+
+                    {{-- Discount & Tax Controls --}}
+                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-gray-200/60">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Potongan Diskon (Rp)</label>
+                            <input type="number" min="0" x-model.number="discountAmount" class="form-input-solid !text-xs !h-7 !py-0.5" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Pajak PPN (%)</label>
+                            <input type="number" min="0" max="100" step="any" x-model.number="taxPercent" class="form-input-solid !text-xs !h-7 !py-0.5" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 border-t border-gray-200">
+                        <span class="text-xs font-bold text-gray-700">Total Akhir Bayar:</span>
+                        <span class="text-base font-black text-primary-600" x-text="formatRupiah(totalCart())"></span>
+                    </div>
                 </div>
 
                 {{-- Payment Method --}}
@@ -149,7 +194,7 @@
                 {{-- Customer Selection --}}
                 <div class="space-y-1.5">
                     <label class="block text-[10px] font-semibold text-gray-500">
-                        Pelanggan <span class="text-accent-600" x-show="paymentMethod === 'credit'">*Wajib</span>
+                        Pelanggan <span class="text-accent-600" x-show="paymentMethod === 'credit'">*Wajib Dipilih</span>
                     </label>
                     <div class="input-group-solid">
                         <span class="input-prefix">
@@ -176,20 +221,20 @@
                     </div>
                 </div>
 
-                {{-- Tanggal Transaksi --}}
-                <div class="space-y-1.5">
-                    <label class="block text-[10px] font-semibold text-gray-500">Tanggal Transaksi</label>
-                    <div class="input-group-solid">
-                        <span class="input-prefix">
-                            <!-- Duotone Icon: Calendar -->
-                            <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path opacity="0.3" d="M3 6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6Z" fill="currentColor"/>
-                                <path d="M3 10H21M8 2V6M16 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </span>
-                        <input type="datetime-local" x-model="saleDate" class="form-input-solid !text-xs !py-2">
+                {{-- Cashier Employee Selection --}}
+                @if(count($employees) > 0)
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-semibold text-gray-500">Petugas Kasir / Sales (Komisi)</label>
+                        <select x-model="cashierEmployeeId" class="form-input-solid !text-xs !py-1.5">
+                            <option value="">-- Pilih Petugas Kasir / Sales --</option>
+                            @foreach($employees as $emp)
+                                <option value="{{ $emp->id }}" {{ (isset($defaultCashier) && $defaultCashier->id == $emp->id) ? 'selected' : '' }}>
+                                    {{ $emp->name }} ({{ $emp->job_title ?: 'Kasir' }})
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
+                @endif
 
                 {{-- Submit Button --}}
                 <button type="button" @click="submitSale()" :disabled="submitting || cart.length === 0"
@@ -204,7 +249,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
-                        <span x-text="submitting ? 'Menyimpan...' : 'Selesai & Cetak Struk'"></span>
+                        <span x-text="submitting ? 'Menyimpan Transaksi...' : 'Selesai & Cetak Struk'"></span>
                     </span>
                 </button>
             </div>
@@ -212,11 +257,11 @@
 
         {{-- Floating Action Buttons (Cart & Search) --}}
         <div class="fixed bottom-24 left-0 right-0 z-40 px-5 pointer-events-none">
-            <div class="max-w-lg mx-auto flex flex-col items-end gap-3">
+            <div class="max-w-7xl mx-auto flex flex-col items-end gap-3 sm:px-6 lg:px-8">
                 
-                {{-- Floating Cart Button (stacked directly above Search) --}}
+                {{-- Floating Cart Button --}}
                 <button type="button" @click="openCart = true" x-show="cart.length > 0" x-transition
-                        class="w-12 h-12 rounded-full bg-white/95 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto"
+                        class="w-12 h-12 rounded-xl bg-white/95 backdrop-blur-md border border-gray-200/80 text-primary-600 flex items-center justify-center shadow-lg active:scale-90 hover:bg-white transition-all transform hover:-translate-y-0.5 duration-150 pointer-events-auto"
                         title="Lihat Keranjang">
                     <div class="relative">
                         <!-- Duotone Icon: Shopping Cart -->
@@ -226,21 +271,21 @@
                             <circle cx="9" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
                             <circle cx="17" cy="20" r="1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/>
                         </svg>
-                        <span class="absolute -top-2 -right-2 bg-accent-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm"
+                        <span class="absolute -top-2 -right-2 bg-accent-500 text-white text-[9px] font-bold w-4 h-4 rounded-md flex items-center justify-center shadow-xs"
                               x-text="cartCount()"></span>
                     </div>
                 </button>
 
                 {{-- Floating Search Button --}}
                 <div class="relative flex justify-end h-12 w-full">
-                    <div class="absolute right-0 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-full overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
-                         :class="openFloatingSearch ? 'w-full h-12' : 'w-12 h-12'">
+                    <div class="absolute right-0 top-0 bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-xl overflow-hidden transition-all duration-300 ease-out pointer-events-auto"
+                         :class="openFloatingSearch ? 'w-full sm:max-w-md h-12' : 'w-12 h-12'">
                          
                          {{-- Collapsed Button --}}
                          <button type="button" x-show="!openFloatingSearch"
-                                 @click="openFloatingSearch = true; $nextTick(() => $refs.floatSearchInput.focus())"
-                                 class="w-full h-full flex items-center justify-center text-primary-600 active:scale-95 transition-transform duration-150"
-                                 title="Cari Barang">
+                                  @click="openFloatingSearch = true; $nextTick(() => $refs.floatSearchInput.focus())"
+                                  class="w-full h-full flex items-center justify-center text-primary-600 active:scale-95 transition-transform duration-150"
+                                  title="Cari Barang">
                              <!-- Duotone Icon: Search -->
                              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                  <circle opacity="0.3" cx="11" cy="11" r="7" fill="currentColor"/>
@@ -291,6 +336,9 @@
                 openCart: false,
                 paymentMethod: 'cash',
                 customerId: '',
+                cashierEmployeeId: '{{ $defaultCashier->id ?? "" }}',
+                discountAmount: 0,
+                taxPercent: {{ $taxPercentage ?? 0 }},
                 saleDate: (function() {
                     const d = new Date();
                     const pad = (n) => String(n).padStart(2, '0');
@@ -320,12 +368,10 @@
                 },
 
                 addToCart(product) {
-                    // Check if already in cart
                     const idx = this.cart.findIndex(item => item.id === product.id);
                     if (idx > -1) {
                         this.incQty(idx);
                     } else {
-                        // Check stock first
                         const buyUnitQty = 1 * product.conversion_factor;
                         if (product.stock < buyUnitQty) {
                             Swal.fire({
@@ -410,14 +456,25 @@
                     return this.cart.reduce((sum, item) => sum + item.quantity, 0);
                 },
 
-                totalCart() {
+                subtotalCart() {
                     return this.cart.reduce((sum, item) => sum + ((item.selling_price || 0) * item.quantity), 0);
+                },
+
+                taxAmountCalc() {
+                    const subtotalAfterDisc = Math.max(0, this.subtotalCart() - Number(this.discountAmount || 0));
+                    return (subtotalAfterDisc * Number(this.taxPercent || 0)) / 100;
+                },
+
+                totalCart() {
+                    const subtotal = this.subtotalCart();
+                    const discount = Number(this.discountAmount || 0);
+                    const tax = this.taxAmountCalc();
+                    return Math.max(0, subtotal - discount + tax);
                 },
 
                 submitSale() {
                     if (this.cart.length === 0) return;
 
-                    // Validate that all items have valid prices
                     for (let i = 0; i < this.cart.length; i++) {
                         const item = this.cart[i];
                         if (item.selling_price === '' || isNaN(item.selling_price) || item.selling_price < 0) {
@@ -447,6 +504,9 @@
                         customer_id: this.customerId || null,
                         sale_date: this.saleDate || null,
                         payment_method: this.paymentMethod,
+                        discount_amount: Number(this.discountAmount || 0),
+                        tax_amount: this.taxAmountCalc(),
+                        cashier_employee_id: this.cashierEmployeeId || null,
                         items: this.cart.map(item => ({
                             product_id: item.id,
                             quantity: item.quantity,
@@ -454,7 +514,6 @@
                         }))
                     };
 
-                    // Open new tab synchronously during user gesture (prevents popup blockers)
                     let receiptWindow = null;
                     try {
                         receiptWindow = window.open('', '_blank');
@@ -478,7 +537,6 @@
                     .then(data => {
                         this.submitting = false;
                         if (data.redirect) {
-                            // Navigate new tab to PDF receipt
                             if (receiptWindow && !receiptWindow.closed) {
                                 receiptWindow.location.href = data.redirect;
                             } else {
@@ -491,7 +549,6 @@
                                 a.remove();
                             }
 
-                            // Wait 800ms before reloading cashier page so new tab navigation completes
                             setTimeout(() => {
                                 window.location.reload();
                             }, 800);
@@ -517,6 +574,14 @@
                             customClass: { popup: 'rounded-2xl font-sans shadow-lg' }
                         });
                     });
+                },
+
+                formatNumber(val) {
+                    return Number(val || 0).toLocaleString('id-ID');
+                },
+
+                formatRupiah(val) {
+                    return 'Rp ' + Number(val || 0).toLocaleString('id-ID');
                 }
             };
         }

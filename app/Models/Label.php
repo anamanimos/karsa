@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Label extends Model
 {
-    protected $fillable = ['name'];
+    use BelongsToBusiness;
+
+    protected $fillable = ['business_id', 'name'];
 
     public function galleries(): BelongsToMany
     {

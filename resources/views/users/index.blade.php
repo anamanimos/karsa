@@ -1,17 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-lg font-bold text-dark">Manajemen Pengguna</h2>
-                <p class="text-xs text-gray-500">Kelola akun administrator dan kasir</p>
-            </div>
-            <a href="{{ route('users.create') }}" class="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform" title="Tambah Pengguna">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            </a>
-        </div>
+        <x-page-header 
+            title="Manajemen Pengguna"
+            subtitle="Kelola akun administrator, staf toko, dan kasir"
+            :searchAction="route('users.index')"
+            searchPlaceholder="Cari nama, email, no. telepon..."
+            :createRoute="route('users.create')"
+            createLabel="Tambah Pengguna"
+        />
     </x-slot>
 
-    <div class="py-4 pb-28 space-y-4 max-w-lg mx-auto" x-data="{
+    <div class="py-5 pb-24 space-y-4" x-data="{ 
         search: '{{ request('search', '') }}',
         role: '{{ request('role', '') }}',
         status: '{{ request('status', '') }}',
@@ -23,49 +22,28 @@
             window.location.href = '{{ route('users.index') }}?' + params.toString();
         }
     }">
-        {{-- Search & Filters --}}
-        <div class="space-y-2.5">
-            {{-- Search Bar --}}
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle opacity="0.3" cx="11" cy="11" r="7" fill="currentColor"/>
-                        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-                        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <input type="text" 
-                       x-model="search" 
-                       @keydown.enter.prevent="applyFilter()"
-                       placeholder="Cari nama, email, atau no. telepon..."
-                       class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-xs font-medium text-dark focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm">
-                <button type="button" 
-                        x-show="search" 
-                        @click="search = ''; applyFilter()" 
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                        style="display: none;">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
+        <x-settings-subnav />
 
+        {{-- Filters (Role & Status) --}}
+        <div class="space-y-2.5">
             {{-- Role Filter Chips --}}
-            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
+            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1 whitespace-nowrap">
                 <button type="button" 
                         @click="role = ''; applyFilter()"
-                        :class="role === '' ? 'bg-primary-600 text-white shadow-sm' : 'bg-white/80 border border-gray-200/80 text-gray-600 hover:bg-white'"
-                        class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shrink-0">
+                        :class="role === '' ? 'bg-primary-600 text-white shadow-xs' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs hover:bg-white hover:text-gray-900'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0">
                     Semua Role
                 </button>
                 <button type="button" 
                         @click="role = 'admin'; applyFilter()"
-                        :class="role === 'admin' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white/80 border border-gray-200/80 text-gray-600 hover:bg-white'"
-                        class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shrink-0">
+                        :class="role === 'admin' ? 'bg-primary-600 text-white shadow-xs' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs hover:bg-white hover:text-gray-900'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0">
                     👑 Admin
                 </button>
                 <button type="button" 
                         @click="role = 'kasir'; applyFilter()"
-                        :class="role === 'kasir' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white/80 border border-gray-200/80 text-gray-600 hover:bg-white'"
-                        class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shrink-0">
+                        :class="role === 'kasir' ? 'bg-primary-600 text-white shadow-xs' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs hover:bg-white hover:text-gray-900'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0">
                     🛒 Kasir
                 </button>
 
@@ -73,15 +51,15 @@
 
                 <button type="button" 
                         @click="status = status === 'active' ? '' : 'active'; applyFilter()"
-                        :class="status === 'active' ? 'bg-green-600 text-white shadow-sm' : 'bg-white/80 border border-gray-200/80 text-gray-600 hover:bg-white'"
-                        class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shrink-0">
-                    🟢 Aktif
+                        :class="status === 'active' ? 'bg-primary-600 text-white shadow-xs' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs hover:bg-white hover:text-gray-900'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0">
+                    ✅ Hanya Aktif
                 </button>
                 <button type="button" 
                         @click="status = status === 'inactive' ? '' : 'inactive'; applyFilter()"
-                        :class="status === 'inactive' ? 'bg-gray-700 text-white shadow-sm' : 'bg-white/80 border border-gray-200/80 text-gray-600 hover:bg-white'"
-                        class="px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shrink-0">
-                    ⚪ Nonaktif
+                        :class="status === 'inactive' ? 'bg-primary-600 text-white shadow-xs' : 'bg-white/90 border border-gray-200/70 text-gray-600 shadow-xs hover:bg-white hover:text-gray-900'"
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0">
+                    ⛔ Nonaktif
                 </button>
             </div>
         </div>

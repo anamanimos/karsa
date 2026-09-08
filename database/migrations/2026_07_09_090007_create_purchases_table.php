@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_number')->unique();
+            $table->string('invoice_number')->index();
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
             $table->date('purchase_date');
             $table->decimal('total_amount', 15, 2);

@@ -3,7 +3,9 @@
         <h2 class="text-lg font-bold text-dark">Satuan Barang</h2>
     </x-slot>
 
-    <div class="py-5 pb-24 space-y-6 max-w-lg mx-auto">
+    <div class="py-5 pb-24 space-y-4">
+        <x-inventory-subnav />
+
         {{-- Form Tambah Satuan --}}
         <div class="card-solid p-4">
             <h3 class="text-sm font-semibold text-dark mb-3">Tambah Satuan Baru</h3>

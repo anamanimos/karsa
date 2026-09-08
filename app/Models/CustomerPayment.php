@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CustomerPayment extends Model
 {
-    protected $fillable = ['sale_id', 'amount', 'payment_date', 'payment_method', 'notes', 'created_by'];
+    use BelongsToBusiness;
+
+    protected $fillable = ['business_id', 'sale_id', 'amount', 'payment_date', 'payment_method', 'notes', 'created_by'];
 
     protected $casts = [
         'amount' => 'double',

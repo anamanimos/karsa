@@ -9,11 +9,18 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
+        $business = \App\Models\Business::first();
+        if ($business) {
+            session(['active_business_id' => $business->id]);
+        }
+
         $categories = [
-            ['name' => 'Pupuk', 'description' => 'Segala jenis pupuk tanaman'],
-            ['name' => 'Benih', 'description' => 'Benih atau bibit tanaman unggul'],
-            ['name' => 'Pestisida', 'description' => 'Cairan/racun pembasmi hama tanaman'],
-            ['name' => 'Alat', 'description' => 'Alat-alat pertanian dan kelengkapannya'],
+            ['name' => 'Makanan & Minuman', 'description' => 'Produk makanan, camilan, dan minuman kemasan atau segar'],
+            ['name' => 'Kebutuhan Harian & Sembako', 'description' => 'Beras, minyak, gula, sabun, dan kebutuhan rumah tangga'],
+            ['name' => 'Elektronik & Aksesoris', 'description' => 'Aksesoris gadget, perkabelan, dan perkakas elektronik'],
+            ['name' => 'Pakaian & Fashion', 'description' => 'Baju, celana, alas kaki, dan aksesoris sandang'],
+            ['name' => 'Pertanian & Bahan Baku', 'description' => 'Pupuk, benih, pakan, bibit, dan perlengkapan tani'],
+            ['name' => 'Jasa & Layanan', 'description' => 'Layanan jasa perbaikan, konsultasi, atau sewa'],
         ];
 
         foreach ($categories as $category) {

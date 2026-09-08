@@ -1,32 +1,24 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-dark">Laporan Penjualan</h2>
-            <div class="flex gap-1 text-[10px]">
-                <a href="{{ route('reports.sales') }}" class="px-2 py-1 rounded bg-primary-600 text-white font-semibold">Penjualan</a>
-                <a href="{{ route('reports.purchases') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Pembelian</a>
-                <a href="{{ route('reports.profit') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Laba Rugi</a>
-                <a href="{{ route('reports.debts') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Hutang</a>
-                <a href="{{ route('reports.stock_movements') }}" class="px-2 py-1 rounded bg-white text-gray-600 border border-gray-200">Riwayat Stok</a>
-            </div>
-        </div>
+        <h2 class="text-lg font-bold text-dark">Laporan Penjualan</h2>
     </x-slot>
 
-    <div class="py-5 pb-24 space-y-4">
+    <div class="py-4 pb-12 space-y-4">
+        <x-reports-subnav />
         {{-- Filter --}}
         <div class="glass-card p-4">
-            <form action="{{ route('reports.sales') }}" method="GET" class="grid grid-cols-2 gap-2">
-                <div>
+            <form action="{{ route('reports.sales') }}" method="GET" class="flex flex-col sm:flex-row sm:items-end gap-3">
+                <div class="w-full sm:w-48">
                     <label class="block text-[10px] font-semibold text-gray-500 mb-1">Mulai</label>
                     <input type="text" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}" class="datepicker form-input-glass py-1.5 px-3">
                 </div>
-                <div>
+                <div class="w-full sm:w-48">
                     <label class="block text-[10px] font-semibold text-gray-500 mb-1">Sampai</label>
                     <input type="text" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}" class="datepicker form-input-glass py-1.5 px-3">
                 </div>
-                <div class="col-span-2 pt-2 flex gap-2">
-                    <button type="submit" class="btn-primary py-2 text-xs flex-1">Filter</button>
-                    <a href="{{ route('reports.sales') }}" class="btn-secondary py-2 text-xs text-center flex-1">Reset</a>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="submit" class="btn-primary py-2 px-4 text-xs flex-1 sm:flex-none">Filter</button>
+                    <a href="{{ route('reports.sales') }}" class="btn-secondary py-2 px-3 text-xs text-center">Reset</a>
                 </div>
             </form>
         </div>

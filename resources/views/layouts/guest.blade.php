@@ -7,11 +7,11 @@
         <meta name="theme-color" content="#16a34a">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="POS Tani">
+        <meta name="apple-mobile-web-app-title" content="KarsaERP">
         <link rel="apple-touch-icon" href="/pwa-icon.png">
         <link rel="manifest" href="/manifest.json">
 
-        <title>{{ config('app.name', 'POS Toko Tani') }} - @yield('title', 'Login')</title>
+        <title>{{ config('app.name', 'KarsaERP') }} - @yield('title', 'Login')</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,18 +38,18 @@
                             <path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </div>
-                    <h1 class="text-2xl font-bold text-dark">POS Toko Tani</h1>
-                    <p class="text-xs text-gray-400 mt-1">Sistem Kasir Pertanian</p>
+                    <h1 class="text-2xl font-bold text-dark">KarsaERP</h1>
+                    <p class="text-xs text-gray-400 mt-1">Platform Cloud ERP & POS Multi-Usaha</p>
                 </div>
 
                 {{-- Card --}}
-                <div class="w-full max-w-sm p-4 page-enter" style="animation-delay: 0.1s;">
+                <div class="w-full {{ $maxWidth ?? 'max-w-md' }} p-4 page-enter" style="animation-delay: 0.1s;">
                     {{ $slot }}
                 </div>
 
                 {{-- Footer --}}
                 <p class="mt-8 text-xs text-gray-400 page-enter" style="animation-delay: 0.2s;">
-                    &copy; {{ date('Y') }} POS Toko Tani
+                    &copy; {{ date('Y') }} KarsaERP
                 </p>
             </div>
         </div>

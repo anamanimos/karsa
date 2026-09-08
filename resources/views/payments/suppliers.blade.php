@@ -4,6 +4,8 @@
     </x-slot>
 
     <div class="py-5 pb-24 space-y-4">
+        <x-procurement-subnav />
+
         {{-- List of outstanding purchases grouped by supplier --}}
         <div class="space-y-4">
             @forelse($purchases as $supplierId => $items)

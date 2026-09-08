@@ -33,6 +33,15 @@ class PurchaseController extends Controller
             $query->where('supplier_id', $request->supplier_id);
         }
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                  ->orWhere('supplier_invoice_number', 'like', "%{$search}%")
+                  ->orWhereHas('supplier', fn ($sq) => $sq->where('name', 'like', "%{$search}%"));
+            });
+        }
+
         $purchases = $query->paginate(15)->withQueryString();
         $suppliers = Supplier::orderBy('name')->get();
 

@@ -1,7 +1,7 @@
 {
-    "name": "POS Toko Tani",
-    "short_name": "POS Tani",
-    "description": "Aplikasi Kasir POS Toko Pertanian Smart",
+    "name": "KarsaERP",
+    "short_name": "KarsaERP",
+    "description": "KarsaERP - Platform Cloud ERP & POS Multi-Usaha",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#FAFAF9",

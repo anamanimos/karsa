@@ -2,54 +2,43 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Gallery extends Model
 {
+    use BelongsToBusiness;
+
     protected $fillable = [
+        'business_id',
         'filename',
         'filepath',
         'mime_type',
         'file_size',
     ];
 
-    /**
-     * Get labels for this gallery image.
-     */
     public function labels(): BelongsToMany
     {
         return $this->belongsToMany(Label::class);
     }
 
-    /**
-     * Get products using this gallery image.
-     */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class, 'image', 'filepath');
     }
 
-    /**
-     * Get purchases using this gallery image.
-     */
     public function purchases(): HasMany
     {
         return $this->hasMany(Purchase::class, 'invoice_image', 'filepath');
     }
 
-    /**
-     * Determine if the gallery image is used anywhere.
-     */
     public function getIsUsedAttribute(): bool
     {
         return $this->products()->exists() || $this->purchases()->exists();
     }
 
-    /**
-     * Get detailed list of usages.
-     */
     public function getUsagesAttribute(): array
     {
         $usages = [];

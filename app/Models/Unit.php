@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Unit extends Model
 {
-    protected $fillable = ['name', 'symbol'];
+    use BelongsToBusiness;
+
+    protected $fillable = ['business_id', 'name', 'symbol'];
 
     public function buyProducts(): HasMany
     {

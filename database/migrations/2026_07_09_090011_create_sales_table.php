@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_number')->unique();
-            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('restrict');
+            $table->string('invoice_number')->index();
+            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
             $table->datetime('sale_date');
             $table->decimal('total_amount', 15, 2);
             $table->enum('payment_method', ['cash', 'qris', 'transfer', 'credit']);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'postani-cache-v1';
+const CACHE_NAME = 'karsa-erp-cache-v1';
 const urlsToCache = [
     '/',
 ];

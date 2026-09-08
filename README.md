@@ -1,6 +1,6 @@
-# POS Toko Tani - Aplikasi Kasir Pertanian
+# KarsaERP - Platform Cloud ERP & POS Multi-Usaha
 
-Aplikasi POS (Point of Sale) mobile-first khusus untuk toko pertanian (jual pupuk, benih, pestisida, alat tani) berbasis Laravel 11, MySQL, Tailwind CSS (Glassmorphism theme), dan Alpine.js.
+Aplikasi SaaS ERP & POS (Point of Sale) serbaguna untuk segala jenis bisnis berbasis Laravel 11, Multi-Tenant, Glassmorphism UI, dan Alpine.js. Dilengkapi fitur POS Kasir, Manajemen Stok Multi-Satuan, SDM & Payroll, serta Laporan Keuangan Lengkap (Arus Kas, Laba Rugi, Neraca).
 
 ## Fitur Utama
 

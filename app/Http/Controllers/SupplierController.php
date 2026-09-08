@@ -9,14 +9,23 @@ use Illuminate\View\View;
 
 class SupplierController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $suppliers = Supplier::withSum(
-                ['purchases as total_debt' => fn ($q) => $q->where('due_amount', '>', 0)],
-                'due_amount'
-            )
-            ->orderBy('name')
-            ->paginate(15);
+        $query = Supplier::withSum(
+            ['purchases as total_debt' => fn ($q) => $q->where('due_amount', '>', 0)],
+            'due_amount'
+        );
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        $suppliers = $query->orderBy('name')->paginate(15)->withQueryString();
 
         return view('suppliers.index', compact('suppliers'));
     }

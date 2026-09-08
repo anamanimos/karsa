@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout maxWidth="max-w-sm">
     <x-slot name="title">Masuk</x-slot>
 
     <!-- Session Status -->
@@ -9,7 +9,7 @@
 
         <!-- Email Address -->
         <div class="space-y-1">
-            <label for="email" class="block text-xs font-bold text-gray-600">Email Kasir</label>
+            <label for="email" class="block text-xs font-bold text-gray-600">Email Akun</label>
             <div class="relative flex items-center">
                 <input id="email" 
                        type="email" 
@@ -18,7 +18,7 @@
                        required 
                        autofocus 
                        autocomplete="username"
-                       placeholder="nama@postani.com"
+                       placeholder="nama@karsaerp.com"
                        class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white/70 backdrop-blur-sm transition-all duration-200 text-sm placeholder-gray-400">
                 
                 <div class="absolute left-0 pl-3 flex items-center justify-center pointer-events-none z-10" style="width: 44px; height: 100%;">
@@ -96,7 +96,7 @@
 
         <div class="pt-2">
             <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 active:scale-[0.98] shadow-md text-sm flex items-center justify-center gap-2">
-                Masuk ke Kasir
+                Masuk ke KarsaERP
                 <!-- Duotone Login/Arrow Icon -->
                 <svg style="width: 20px; height: 20px; color: #ffffff; display: block;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="12" cy="12" r="9" fill="currentColor" class="opacity-30" />
@@ -105,5 +105,11 @@
                 </svg>
             </button>
         </div>
+
+        @if (Route::has('register'))
+            <div class="text-center pt-3 text-xs text-gray-500">
+                Belum punya akun? <a href="{{ route('register') }}" class="text-primary-600 font-bold hover:underline">Daftar Usaha Sekarang</a>
+            </div>
+        @endif
     </form>
 </x-guest-layout>

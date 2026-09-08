@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleItem extends Model
 {
-    protected $fillable = ['sale_id', 'product_id', 'quantity', 'unit_price', 'subtotal'];
+    use BelongsToBusiness;
+
+    protected $fillable = ['business_id', 'sale_id', 'product_id', 'quantity', 'unit_price', 'subtotal'];
 
     protected $casts = [
         'quantity' => 'double',

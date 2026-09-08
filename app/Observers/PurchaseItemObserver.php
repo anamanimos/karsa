@@ -21,8 +21,12 @@ class PurchaseItemObserver
      */
     public function created(PurchaseItem $purchaseItem): void
     {
-        $product = $purchaseItem->product;
-        $purchase = $purchaseItem->purchase;
+        $product = $purchaseItem->product ?? \App\Models\Product::withoutGlobalScope('business')->find($purchaseItem->product_id);
+        $purchase = $purchaseItem->purchase ?? \App\Models\Purchase::withoutGlobalScope('business')->find($purchaseItem->purchase_id);
+
+        if (!$product) {
+            return;
+        }
 
         // 1. Increase product stock by quantity (already in buy_unit) and log movement
         $invoiceNo = $purchase ? $purchase->invoice_number : '';

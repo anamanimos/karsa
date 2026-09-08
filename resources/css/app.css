@@ -31,8 +31,8 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 16px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border-radius: 10px;
+        box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.05);
     }
 
     .glass-card-solid {
@@ -40,8 +40,8 @@
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.5);
-        border-radius: 16px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border-radius: 10px;
+        box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.05);
     }
 
     /* Glass Navigation */
@@ -50,32 +50,33 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
         box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.05);
     }
 
     /* Primary Button */
     .btn-primary {
-        @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 ease-out;
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white transition-all duration-200 ease-out;
         background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-        box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.3);
+        box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.25);
     }
     .btn-primary:hover {
-        box-shadow: 0 6px 20px 0 rgba(22, 163, 74, 0.45);
+        box-shadow: 0 6px 20px 0 rgba(22, 163, 74, 0.35);
         transform: translateY(-1px);
     }
     .btn-primary:active {
         transform: translateY(0);
-        box-shadow: 0 2px 8px 0 rgba(22, 163, 74, 0.3);
+        box-shadow: 0 2px 8px 0 rgba(22, 163, 74, 0.25);
     }
 
     /* Accent Button */
     .btn-accent {
-        @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 ease-out;
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white transition-all duration-200 ease-out;
         background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-        box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.3);
+        box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.25);
     }
     .btn-accent:hover {
-        box-shadow: 0 6px 20px 0 rgba(249, 115, 22, 0.45);
+        box-shadow: 0 6px 20px 0 rgba(249, 115, 22, 0.35);
         transform: translateY(-1px);
     }
     .btn-accent:active {
@@ -84,28 +85,28 @@
 
     /* Secondary/Outline Button */
     .btn-secondary {
-        @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ease-out;
-        @apply bg-white/60 border border-gray-200 text-gray-700;
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ease-out;
+        @apply bg-white/70 border border-gray-200 text-gray-700;
         backdrop-filter: blur(8px);
     }
     .btn-secondary:hover {
-        @apply bg-white/80 border-gray-300;
+        @apply bg-white border-gray-300;
     }
 
     /* Danger Button */
     .btn-danger {
-        @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 ease-out;
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white transition-all duration-200 ease-out;
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.3);
+        box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.25);
     }
     .btn-danger:hover {
-        box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.45);
+        box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.35);
         transform: translateY(-1px);
     }
 
     /* Form Input */
     .form-input-glass {
-        @apply w-full px-4 py-3 rounded-xl text-sm transition-all duration-200;
+        @apply w-full px-3.5 py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200;
         background: rgba(255, 255, 255, 0.7);
         border: 1.5px solid rgba(209, 213, 219, 0.6);
         backdrop-filter: blur(8px);
@@ -117,19 +118,19 @@
 
     /* Status Badges */
     .badge-paid {
-        @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+        @apply inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold;
         @apply bg-green-100 text-green-700;
     }
     .badge-partial {
-        @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+        @apply inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold;
         @apply bg-yellow-100 text-yellow-700;
     }
     .badge-unpaid {
-        @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+        @apply inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold;
         @apply bg-red-100 text-red-700;
     }
     .badge-info {
-        @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+        @apply inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold;
         @apply bg-blue-100 text-blue-700;
     }
 
@@ -200,7 +201,7 @@
         backdrop-filter: blur(4px);
     }
     .bottom-sheet {
-        @apply fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl;
+        @apply fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
         border-top: 1px solid rgba(255, 255, 255, 0.5);
@@ -214,22 +215,34 @@
     /* Scrollbar styling */
     ::-webkit-scrollbar {
         width: 4px;
+        height: 4px;
     }
     ::-webkit-scrollbar-track {
         background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(22, 163, 74, 0.2);
-        border-radius: 10px;
+        background: rgba(156, 163, 175, 0.35);
+        border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(22, 163, 74, 0.4);
+        background: rgba(107, 114, 128, 0.5);
+    }
+
+    /* Scrollbar Hide Utility */
+    .scrollbar-hide, .no-scrollbar {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+    .scrollbar-hide::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
 
     /* Solid Card */
     .card-solid {
-        @apply bg-white border border-gray-300 rounded-xl;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        @apply bg-white border border-gray-200 rounded-lg;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
     }
 
     /* Input Group Container */

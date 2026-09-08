@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class StockMovement extends Model
 {
+    use BelongsToBusiness;
+
     protected $fillable = [
+        'business_id',
         'product_id',
         'type',
         'quantity',
@@ -85,6 +89,7 @@ class StockMovement extends Model
         }
 
         $data = [
+            'business_id' => $product->business_id,
             'product_id' => $product->id,
             'type' => $type,
             'quantity' => $quantityChange,

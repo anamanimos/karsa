@@ -2,13 +2,14 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="text-lg font-bold text-dark">Buku Kas Manual</h2>
-            <a href="{{ route('cash-transactions.create') }}" class="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-full">
+            <a href="{{ route('cash-transactions.create') }}" class="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-lg">
                 <span>➕ Transaksi Kas</span>
             </a>
         </div>
     </x-slot>
 
     <div class="py-5 pb-24 space-y-4">
+        <x-procurement-subnav />
         {{-- Balance summary --}}
         <div class="glass-card p-4 flex items-center justify-between bg-primary-50/10 border-l-4 border-primary-500">
             <div>

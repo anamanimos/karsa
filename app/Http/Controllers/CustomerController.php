@@ -9,14 +9,23 @@ use Illuminate\View\View;
 
 class CustomerController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $customers = Customer::withSum(
-                ['sales as total_receivable' => fn ($q) => $q->where('due_amount', '>', 0)],
-                'due_amount'
-            )
-            ->orderBy('name')
-            ->paginate(15);
+        $query = Customer::withSum(
+            ['sales as total_receivable' => fn ($q) => $q->where('due_amount', '>', 0)],
+            'due_amount'
+        );
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $query->orderBy('name')->paginate(15)->withQueryString();
 
         return view('customers.index', compact('customers'));
     }
