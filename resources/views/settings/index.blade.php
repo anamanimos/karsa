@@ -4,6 +4,26 @@
     </x-slot>
 
     <div class="py-5 pb-24 space-y-4">
+        {{-- Manajemen Pengguna Shortcut Card --}}
+        <a href="{{ route('users.index') }}" class="glass-card p-4 flex items-center justify-between hover:bg-white/80 transition-all block group">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-600 group-hover:scale-105 transition-transform">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path opacity="0.3" d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor"/>
+                        <path d="M6 21C6 17.134 9.13401 14 13 14H11C7.13401 14 4 17.134 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-dark">Manajemen Pengguna</h3>
+                    <p class="text-xs text-gray-500">Kelola akun kasir dan administrator toko</p>
+                </div>
+            </div>
+            <span class="text-xs font-bold text-primary-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                Kelola →
+            </span>
+        </a>
+
         <form action="{{ route('settings.update') }}" method="POST" class="space-y-4">
             @csrf
             @method('PUT')

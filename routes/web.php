@@ -15,6 +15,7 @@ use App\Http\Controllers\CashTransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Public route - redirect to login
@@ -58,6 +59,9 @@ Route::middleware(['auth'])->group(function () {
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+    
+    // Users Management
+    Route::resource('users', UserController::class);
     
     // Cash Transactions
     Route::resource('cash-transactions', CashTransactionController::class);

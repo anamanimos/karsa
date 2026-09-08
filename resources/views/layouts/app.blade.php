@@ -246,6 +246,14 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                                     Pengaturan
                                 </a>
+                                <a href="{{ route('users.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary-700 transition-colors">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path opacity="0.3" d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" fill="currentColor"/>
+                                        <path d="M6 21C6 17.134 9.13401 14 13 14H11C7.13401 14 4 17.134 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    Kelola Pengguna
+                                </a>
 
                             </div>
                         </div>
@@ -357,11 +365,11 @@
 
                         {{-- More --}}
                         <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
-                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button @click="open = !open" class="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200 group {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'bg-primary-50/80' : 'hover:bg-gray-50/50' }}">
+                                <svg class="w-6 h-6 transition-colors {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                                 </svg>
-                                <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Lainnya</span>
+                                <span class="text-[10px] mt-1 font-semibold {{ request()->routeIs('products.*', 'suppliers.*', 'customers.*', 'categories.*', 'units.*', 'payments.*', 'settings.*', 'cash-transactions.*', 'reports.*', 'users.*') ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600' }}">Lainnya</span>
                             </button>
                             {{-- More Menu Popup --}}
                             <div x-show="open" @click.away="open = false"
@@ -402,6 +410,9 @@
                                 </a>
                                 <a href="{{ route('cash-transactions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('cash-transactions.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
                                     <span class="text-lg">🏦</span> Kas
+                                </a>
+                                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm {{ request()->routeIs('users.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50' }} transition-colors">
+                                    <span class="text-lg">👤</span> Pengguna
                                 </a>
                             </div>
                         </div>
